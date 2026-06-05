@@ -426,7 +426,7 @@
 <div class="sidebar">
   <div class="sidebar-header">
     <h1>Corne Keymap</h1>
-    <div class="subtitle">42 keys &middot; 7 layers &middot; 8 combos</div>
+    <div class="subtitle">42 keys &middot; 7 layers &middot; 14 combos</div>
   </div>
   <div class="sidebar-section">Layers</div>
   <div class="layer-list" id="layerList"></div>
@@ -446,6 +446,7 @@
     <div class="toolbar-title" id="toolbarTitle">base</div>
     <div style="display:flex;align-items:center;gap:12px">
       <div class="toolbar-info">Corne &middot; Nice!Nano v2 &middot; ZMK</div>
+      <button class="cheat-toggle" id="combosToggle" onclick="toggleCombos()">Combos ✓</button>
       <button class="cheat-toggle" onclick="toggleCheatSheet()">Cheat Sheet</button>
     </div>
   </div>
@@ -506,23 +507,49 @@ const layers = {
     keys: [
       {t:"TAB"},{t:"Q"},{t:"W"},{t:"E"},{t:"R"},{t:"T"},
       {t:"Y"},{t:"U"},{t:"I"},{t:"O"},{t:"P"},{t:"BSPC"},
-      {t:"LCTRL"},{t:"A",h:"CMD"},{t:"S",h:"OPT"},{t:"D",h:"CTRL"},{t:"F",h:"SHIFT"},{t:"G"},
-      {t:"H"},{t:"J",h:"SHIFT"},{t:"K",h:"CTRL"},{t:"L",h:"OPT"},{t:";",h:"CMD"},{t:"'"},
+      {t:"ESC",h:"CTRL"},{t:"A",h:"CMD"},{t:"S",h:"OPT"},{t:"D",h:"CTRL"},{t:"F",h:"SHIFT"},{t:"G"},
+      {t:"H"},{t:"J",h:"SHIFT"},{t:"K",h:"CTRL"},{t:"L",h:"OPT"},{t:"'",h:"CMD"},{t:"HYPR"},
       {t:"LSHFT"},{t:"Z"},{t:"X"},{t:"C"},{t:"V"},{t:"B"},
       {t:"N"},{t:"M"},{t:","},{t:"."},{t:"/"},{t:"ESC"},
       {t:"ESC",h:"media",type:"layer"},{t:"SPACE",h:"nav",type:"layer"},{t:"TAB",h:"mouse",type:"layer"},
       {t:"ENTER",h:"sym",type:"layer"},{t:"BSPC",h:"num",type:"layer"},{t:"DEL",h:"fun",type:"layer"}
     ]
   },
+  nav: {
+    icon: "V", color: "#eab308",
+    keys: [
+      {},{},{},{},{},{},
+      {t:"REDO",type:"nav"},{t:"PASTE",type:"nav"},{t:"COPY",type:"nav"},{t:"CUT",type:"nav"},{t:"UNDO",type:"nav"},{},
+      {},{t:"LGUI",type:"mod"},{t:"LALT",type:"mod"},{t:"LCTRL",type:"mod"},{t:"LSHIFT",type:"mod"},{},
+      {t:"\u2190",type:"nav"},{t:"\u2193",type:"nav"},{t:"\u2191",type:"nav"},{t:"\u2192",type:"nav"},{t:"CAPS",type:"nav"},{},
+      {},{},{},{},{},{},
+      {t:"INS",type:"nav"},{t:"HOME",type:"nav"},{t:"PGDN",type:"nav"},{t:"PGUP",type:"nav"},{t:"END",type:"nav"},{},
+      {},{type:"held"},{},
+      {t:"ENTER"},{t:"BSPC"},{t:"DEL"}
+    ]
+  },
+  num: {
+    icon: "N", color: "#06b6d4",
+    keys: [
+      {},{t:"[",type:"num"},{t:"7",type:"num"},{t:"8",type:"num"},{t:"9",type:"num"},{t:"]",type:"num"},
+      {},{},{},{},{},{},
+      {},{t:";",type:"num"},{t:"4",type:"num"},{t:"5",type:"num"},{t:"6",type:"num"},{t:"=",type:"num"},
+      {},{t:"RSHFT",type:"mod"},{t:"RCTRL",type:"mod"},{t:"RALT",type:"mod"},{t:"RGUI",type:"mod"},{},
+      {},{t:"`",type:"num"},{t:"1",type:"num"},{t:"2",type:"num"},{t:"3",type:"num"},{t:"\\",type:"num"},
+      {},{},{},{},{},{},
+      {t:".",type:"num"},{t:"0",type:"num"},{t:"-",type:"num"},
+      {},{type:"held"},{}
+    ]
+  },
   media: {
     icon: "M", color: "#f6a623",
     keys: [
-      {},{t:"BT CLR\nALL",type:"bt"},{},{},{},{},
-      {t:"RGB\nTOG",type:"rgb"},{t:"RGB\nEFF",type:"rgb"},{t:"RGB\nHUE+",type:"rgb"},{t:"RGB\nSAT+",type:"rgb"},{t:"RGB\nCOLOR",type:"rgb"},{},
+      {},{},{},{},{},{},
+      {t:"RGB\nTOG",type:"rgb"},{t:"RGB\nEFF",type:"rgb"},{t:"RGB\nHUE+",type:"rgb"},{t:"RGB\nSAT+",type:"rgb"},{},{},
       {},{t:"LGUI",type:"mod"},{t:"LALT",type:"mod"},{t:"LCTRL",type:"mod"},{t:"LSHIFT",type:"mod"},{},
       {t:"EP TOG",type:"media"},{t:"PREV",type:"media"},{t:"VOL-",type:"media"},{t:"VOL+",type:"media"},{t:"NEXT",type:"media"},{},
       {},{},{},{},{},{},
-      {t:"OUT\nTOG"},{t:"BT 0",type:"bt"},{t:"BT 1",type:"bt"},{t:"BT 2",type:"bt"},{t:"BT 3",type:"bt"},{t:"BT CLR\nALL",type:"bt"},
+      {t:"OUT\nTOG",type:"bt"},{t:"BT 0",type:"bt"},{t:"BT 1",type:"bt"},{t:"BT 2",type:"bt"},{t:"BT 3",type:"bt"},{t:"BT CLR\nALL",type:"bt"},
       {type:"held"},{},{},
       {t:"STOP",type:"media"},{t:"PLAY\nPAUSE",type:"media"},{t:"MUTE",type:"media"}
     ]
@@ -540,42 +567,16 @@ const layers = {
       {type:"held"},{},{}
     ]
   },
-  num: {
-    icon: "N", color: "#06b6d4",
-    keys: [
-      {},{t:"[",type:"num"},{t:"7",type:"num"},{t:"8",type:"num"},{t:"9",type:"num"},{t:"]",type:"num"},
-      {},{},{},{},{},{},
-      {},{t:";",type:"num"},{t:"4",type:"num"},{t:"5",type:"num"},{t:"6",type:"num"},{t:"=",type:"num"},
-      {},{t:"RSHFT",type:"mod"},{t:"RCTRL",type:"mod"},{t:"RALT",type:"mod"},{t:"RGUI",type:"mod"},{},
-      {},{t:"`",type:"num"},{t:"1",type:"num"},{t:"2",type:"num"},{t:"3",type:"num"},{t:"\\",type:"num"},
-      {},{},{},{},{},{},
-      {t:".",type:"num"},{t:"0",type:"num"},{t:"-",type:"num"},
-      {},{type:"held"},{}
-    ]
-  },
-  nav: {
-    icon: "V", color: "#eab308",
-    keys: [
-      {},{},{},{},{},{},
-      {t:"REDO",type:"nav"},{t:"PASTE",type:"nav"},{t:"COPY",type:"nav"},{t:"CUT",type:"nav"},{t:"UNDO",type:"nav"},{},
-      {},{t:"LGUI",type:"mod"},{t:"LALT",type:"mod"},{t:"LCTRL",type:"mod"},{t:"LSHIFT",type:"mod"},{},
-      {t:"CAPS",type:"nav"},{t:"\u2190",type:"nav"},{t:"\u2193",type:"nav"},{t:"\u2191",type:"nav"},{t:"\u2192",type:"nav"},{},
-      {},{},{},{},{},{},
-      {t:"INS",type:"nav"},{t:"HOME",type:"nav"},{t:"PGDN",type:"nav"},{t:"PGUP",type:"nav"},{t:"END",type:"nav"},{},
-      {},{type:"held"},{},
-      {t:"ENTER"},{t:"BSPC"},{t:"DEL"}
-    ]
-  },
   fun: {
     icon: "F", color: "#22c55e",
     keys: [
-      {},{t:"F12",type:"fn"},{t:"F7",type:"fn"},{t:"F8",type:"fn"},{t:"F9",type:"fn"},{},
+      {},{t:"F12",type:"fn"},{t:"F7",type:"fn"},{t:"F8",type:"fn"},{t:"F9",type:"fn"},{t:"PSCRN",type:"fn"},
       {},{},{},{},{},{},
-      {},{t:"F11",type:"fn"},{t:"F4",type:"fn"},{t:"F5",type:"fn"},{t:"F6",type:"fn"},{},
+      {},{t:"F11",type:"fn"},{t:"F4",type:"fn"},{t:"F5",type:"fn"},{t:"F6",type:"fn"},{t:"SLCK",type:"fn"},
       {},{t:"RSHFT",type:"mod"},{t:"RCTRL",type:"mod"},{t:"RALT",type:"mod"},{t:"RGUI",type:"mod"},{},
-      {},{t:"F10",type:"fn"},{t:"F1",type:"fn"},{t:"F2",type:"fn"},{t:"F3",type:"fn"},{},
+      {},{t:"F10",type:"fn"},{t:"F1",type:"fn"},{t:"F2",type:"fn"},{t:"F3",type:"fn"},{t:"PAUSE",type:"fn"},
       {},{},{},{},{},{},
-      {},{t:"SPACE"},{t:"TAB"},
+      {t:"K_APP"},{t:"SPACE"},{t:"TAB"},
       {},{},{type:"held"}
     ]
   },
@@ -583,27 +584,37 @@ const layers = {
     icon: "P", color: "#f97316",
     keys: [
       {},{},{},{},{},{},
-      {t:"REDO",type:"nav"},{t:"PASTE",type:"nav"},{t:"COPY",type:"nav"},{t:"CUT",type:"nav"},{t:"UNDO",type:"nav"},{},
+      {},{},{},{},{},{},
       {},{t:"LGUI",type:"mod"},{t:"LALT",type:"mod"},{t:"LCTRL",type:"mod"},{t:"LSHIFT",type:"mod"},{},
       {t:"\u2190",type:"mouse"},{t:"\u2193",type:"mouse"},{t:"\u2191",type:"mouse"},{t:"\u2192",type:"mouse"},{},{},
       {},{},{},{},{},{},
-      {},{},{},{},{},{},
+      {t:"SCRL\n\u2190",type:"mouse"},{t:"SCRL\n\u2193",type:"mouse"},{t:"SCRL\n\u2191",type:"mouse"},{t:"SCRL\n\u2192",type:"mouse"},{},{},
       {},{},{type:"held"},
-      {t:"RCLK",type:"mouse"},{t:"LCLK",type:"mouse"},{t:"MCLK",type:"mouse"}
+      {t:"MCLK",type:"mouse"},{t:"LCLK",type:"mouse"},{t:"RCLK",type:"mouse"}
     ]
   }
 };
 
 // Combos: positioned dynamically between key pairs
 const combosDef = [
-  { keys: [3,4], label: "[" },
-  { keys: [7,8], label: "]" },  // 7=U(right row0 col1), 8=I(right row0 col2)
-  { keys: [15,16], label: "(" }, // 15=D, 16=F
-  { keys: [19,20], label: ")" }, // 19=J, 20=K
-  { keys: [27,28], label: "{" }, // 27=C, 28=V
-  { keys: [31,32], label: "}" }, // 31=M(right), 32=comma
-  { keys: [5,6], label: "\\", wide: true },   // 5=T, 6=Y (across split)
-  { keys: [17,18], label: "|", wide: true },   // 17=G, 18=H (across split)
+  // Row 0 horizontal adjacent
+  { keys: [2,3],   label: "ESC"  },          // W+E
+  { keys: [8,9],   label: "BSPC" },          // I+O
+  { keys: [9,10],  label: "DEL"  },          // O+P
+  // Row 1 horizontal adjacent
+  { keys: [14,15], label: "TAB"  },          // S+D
+  { keys: [16,19], label: "CAPS\nWD" },      // F+J (cross-split)
+  { keys: [20,21], label: "RET"  },          // K+L
+  { keys: [21,22], label: ";"    },          // L+'
+  // Row 2 horizontal adjacent / near-adjacent
+  { keys: [26,27], label: "COPY" },          // X+C
+  { keys: [27,28], label: "PASTE"},          // C+V
+  { keys: [26,28], label: "CUT"  },          // X+V (skip C)
+  // Vertical same-column combos
+  { keys: [19,31], label: "-"    },          // J+M
+  { keys: [18,30], label: "_"    },          // H+N
+  { keys: [16,28], label: "="    },          // F+V
+  { keys: [14,26], label: "\`"   },          // S+X
 ];
 
 const layerDescriptions = {
@@ -617,6 +628,17 @@ const layerDescriptions = {
 };
 
 let currentLayer = 'base';
+let combosVisible = true;
+
+function modGlyph(s) {
+  if (!s) return null;
+  const u = s.toUpperCase();
+  if (/^(CMD|GUI|LGUI|RGUI)$/.test(u)) return '\u2318';
+  if (/^(OPT|ALT|LALT|RALT)$/.test(u)) return '\u2325';
+  if (/^(CTRL|LCTRL|RCTRL)$/.test(u)) return '\u2303';
+  if (/^(SHIFT|SHFT|LSHFT|RSHFT|LSHIFT|RSHIFT)$/.test(u)) return '\u21E7';
+  return null;
+}
 
 function getKeyClass(key) {
   if (!key || (!key.t && !key.type)) return 'key-empty';
@@ -676,11 +698,15 @@ function renderKeyboard() {
 
       if (key.type === 'held') {
         el.innerHTML = '<div class="tap" style="font-size:18px;color:#e94560">&#9679;</div>';
+      } else if (tapText === 'HYPR') {
+        el.innerHTML = '<div class="tap">HYPER</div><div class="hold" style="font-size:9px;letter-spacing:1px">\u2318\u2325\u2303\u21E7</div>';
       } else {
-        let tapHtml = tapText.split('\n').map(l => `<div>${l}</div>`).join('');
+        const displayTap = modGlyph(tapText) || tapText;
+        let tapHtml = displayTap.split('\n').map(l => `<div>${l}</div>`).join('');
         el.innerHTML = `<div class="tap">${tapHtml}</div>`;
         if (holdText) {
-          el.innerHTML += `<div class="hold">${holdText}</div>`;
+          const displayHold = key.type !== 'layer' ? (modGlyph(holdText) || holdText) : holdText;
+          el.innerHTML += `<div class="hold">${displayHold}</div>`;
         }
       }
     }
@@ -692,19 +718,36 @@ function renderKeyboard() {
     kb.appendChild(el);
   });
 
-  // Render combos — compute position midpoint between the two keys, offset above
-  combosDef.forEach(combo => {
-    const p1 = positions[combo.keys[0]];
-    const p2 = positions[combo.keys[1]];
-    if (!p1 || !p2) return;
-    const midX = (p1.x + p2.x) / 2 + KW / 2 - 15; // center the 30px combo box
-    const midY = Math.min(p1.y, p2.y) - 30; // sit above the keys
-    const el = document.createElement('div');
-    el.className = 'combo';
-    el.style.cssText = `left:${midX}px;top:${midY}px;width:30px;height:22px;font-size:11px;`;
-    el.textContent = combo.label;
-    kb.appendChild(el);
-  });
+  // Render combos — only on base layer, with connector lines, when combosVisible
+  if (currentLayer === 'base' && combosVisible) {
+    combosDef.forEach(combo => {
+      const p1 = positions[combo.keys[0]];
+      const p2 = positions[combo.keys[1]];
+      if (!p1 || !p2) return;
+
+      const cx1 = p1.x + p1.w / 2;
+      const cy1 = p1.y + p1.h / 2;
+      const cx2 = p2.x + p2.w / 2;
+      const cy2 = p2.y + p2.h / 2;
+      const len = Math.hypot(cx2 - cx1, cy2 - cy1);
+      const angle = Math.atan2(cy2 - cy1, cx2 - cx1) * 180 / Math.PI;
+
+      const line = document.createElement('div');
+      line.className = 'combo-line';
+      line.style.cssText = `left:${cx1}px;top:${cy1}px;width:${len}px;transform:rotate(${angle}deg);transform-origin:0 50%;`;
+      kb.appendChild(line);
+
+      const midX = (cx1 + cx2) / 2;
+      const midY = (cy1 + cy2) / 2;
+      const labelText = combo.label;
+      const w = Math.max(28, labelText.replace(/\n.*/, '').length * 7 + 10);
+      const el = document.createElement('div');
+      el.className = 'combo';
+      el.style.cssText = `left:${midX}px;top:${midY}px;width:${w}px;height:22px;font-size:10px;white-space:nowrap;transform:translate(-50%,-50%);`;
+      el.textContent = labelText;
+      kb.appendChild(el);
+    });
+  }
 
   document.getElementById('toolbarTitle').textContent = `${currentLayer} — ${layerDescriptions[currentLayer]}`;
 }
@@ -735,6 +778,13 @@ function switchLayer(name) {
   renderLayerList();
   renderKeyboard();
   if (document.getElementById('rawPanel').classList.contains('open')) renderRawTable();
+}
+
+function toggleCombos() {
+  combosVisible = !combosVisible;
+  const btn = document.getElementById('combosToggle');
+  if (btn) btn.textContent = combosVisible ? 'Combos \u2713' : 'Combos';
+  renderKeyboard();
 }
 
 // Keyboard shortcuts
@@ -975,7 +1025,7 @@ function analyzeKeymap() {
   }
 
   // 8. Combos section
-  const comboRows = combos.map(c => {
+  const comboRows = combosDef.map(c => {
     const k1 = layers.base.keys[c.keys[0]];
     const k2 = layers.base.keys[c.keys[1]];
     return {
