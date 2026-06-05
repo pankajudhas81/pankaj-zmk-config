@@ -189,7 +189,7 @@
             bindings = <
 &none          &none       &none       &none         &none         &none          &kp LG(LS(Z)) &kp LG(V)   &kp LG(C)     &kp LG(X)    &kp LG(Z)    &none
 &none          &kp LGUI    &kp LALT    &kp LCTRL     &kp LSHFT     &none          &kp LEFT    &kp DOWN      &kp UP        &kp RIGHT    &kp CAPS     &none
-&none          &none       &none       &none         &none         &none          &kp INS     &kp HOME      &kp PG_DN     &kp PG_UP    &kp END      &none
+&none          &none       &none       &none         &none         &none          &kp HOME    &kp PG_DN     &kp PG_UP     &kp END      &kp INS      &none
                                        &none         &none         &none          &kp RET     &kp BSPC      &kp DEL
             >;
         };
@@ -199,7 +199,7 @@
             bindings = <
 &none          &kp LBKT    &kp N7      &kp N8        &kp N9        &kp RBKT       &none       &none         &none         &none        &none        &none
 &none          &kp SEMI    &kp N4      &kp N5        &kp N6        &kp EQUAL      &none       &kp RSHFT     &kp RCTRL     &kp RALT     &kp RGUI     &none
-&none          &kp GRAVE   &kp N1      &kp N2        &kp N3        &kp BSLH       &none       &none         &none         &none        &none        &none
+&none          &kp TILDE   &kp N1      &kp N2        &kp N3        &kp BSLH       &none       &none         &none         &none        &none        &none
                                        &kp DOT       &kp N0        &kp MINUS      &none       &none         &none
             >;
         };
