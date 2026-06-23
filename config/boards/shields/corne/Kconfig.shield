@@ -1,8 +1,29 @@
+# ═══════════════════════════════════════════════════════════════════
+# FILE: config/boards/shields/corne/Kconfig.shield
+# ROLE: Declares the SHIELD_CORNE_LEFT and SHIELD_CORNE_RIGHT Kconfig symbols.
+#
+# Zephyr evaluates this file early in the Kconfig pass and auto-sets each
+# symbol to true or false based on which shield names were passed to the build
+# command via the SHIELD variable. All `if SHIELD_CORNE_LEFT / RIGHT` guards
+# in Kconfig.defconfig depend on these symbols. You never edit this file —
+# the values are derived automatically from the build invocation.
+# ═══════════════════════════════════════════════════════════════════
+
 # Copyright (c) 2020 Pete Johanson
 # SPDX-License-Identifier: MIT
 
+
+# ─── Per-half shield detection ────────────────────────────────────────────────
+
+# Automatically true when "corne_left" appears in the SHIELD build variable.
+# Signals to Kconfig.defconfig (and any other Kconfig file) that this firmware
+# image is for the LEFT half, enabling central-role defaults, Studio config,
+# and the left-specific keyboard name.
 config SHIELD_CORNE_LEFT
 	def_bool $(shields_list_contains,corne_left)
 
+# Automatically true when "corne_right" appears in the SHIELD build variable.
+# Signals that this firmware image is for the RIGHT half, enabling peripheral-
+# role defaults and the custom display compilation path.
 config SHIELD_CORNE_RIGHT
 	def_bool $(shields_list_contains,corne_right)

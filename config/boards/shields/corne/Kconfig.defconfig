@@ -1,48 +1,127 @@
+# ═══════════════════════════════════════════════════════════════════
+# FILE: config/boards/shields/corne/Kconfig.defconfig
+# ROLE: Shield default values injected into the Kconfig system at build time.
+#
+# Sets sensible defaults for the keyboard name, split role, I2C/SSD1306 driver,
+# and LVGL rendering settings so they do not need to be repeated in .conf files.
+# The `default` keyword never overrides an explicit user choice, so anything
+# here can still be changed in corne_left.conf or corne_right.conf. You rarely
+# edit this file directly; it wires up infrastructure, not behaviour.
+# ═══════════════════════════════════════════════════════════════════
+
+
+# ─── Left-half-only defaults ──────────────────────────────────────────────────
+#
+# Options inside this block apply only when the LEFT shield is in the build.
+# The left half is the USB-central half, so keyboard identity and split role
+# are configured here.
+
 if SHIELD_CORNE_LEFT
 
+# The human-readable name reported to the host OS over USB/BLE HID.
+# Appears as the device name in Bluetooth pairing dialogs and USB device lists.
+# Overridable in corne_left.conf if you want a different display name.
 config ZMK_KEYBOARD_NAME
 	default "Corne"
 
+# Mark this half as the CENTRAL role in the ZMK split topology.
+# The central is the half that holds the USB connection, receives keycodes from
+# the peripheral over BLE, merges both halves into a single HID report, and
+# sends that report to the host.  There can only be one central per split pair.
 config ZMK_SPLIT_ROLE_CENTRAL
 	default y
 
-endif
+endif # SHIELD_CORNE_LEFT
+
+
+# ─── Shared defaults (both halves) ───────────────────────────────────────────
+#
+# Options inside this block apply whenever either half (left or right) is in
+# the build.  Most display and LVGL settings live here because both halves
+# have an OLED, even though each half uses a different screen layout.
 
 if SHIELD_CORNE_LEFT || SHIELD_CORNE_RIGHT
 
+# Enable the ZMK wireless-split subsystem.
+# This is what allows the two halves to talk to each other over BLE: the
+# peripheral scans for and bonds to the central, then streams its key matrix
+# events across the link in real time.
 config ZMK_SPLIT
 	default y
 
+
+# ── Display driver defaults ──────────────────────────────────────────────────
+#
+# Automatically pull in the hardware dependencies whenever the OLED display
+# feature is turned on, so the user does not have to enable them manually.
+
 if ZMK_DISPLAY
 
+# Enable Zephyr's I2C bus subsystem.
+# The SSD1306 OLED on the Corne is wired over I2C; without this, the display
+# driver has no bus to communicate over and will fail to initialise at boot.
 config I2C
 	default y
 
+# Enable the SSD1306 OLED controller driver.
+# The Corne uses a 128×32 SSD1306-based OLED module.  This driver translates
+# LVGL framebuffer updates into the I2C command sequences the panel understands.
 config SSD1306
 	default y
 
 endif # ZMK_DISPLAY
 
+
+# ── LVGL rendering defaults ──────────────────────────────────────────────────
+#
+# Fine-tune LVGL's rendering pipeline for the Corne's small monochrome OLED.
+# These defaults give sharp, correct output without wasting RAM or flash.
+
 if LVGL
 
+# Virtual display buffer size as a percentage of the total screen height.
+# LVGL renders into this intermediate buffer before pushing pixels to the
+# display driver.  64 % of 32 rows ≈ 20 rows buffered at a time, which is
+# a good balance between rendering throughput and RAM usage on a small MCU.
 config LV_Z_VDB_SIZE
 	default 64
 
+# Logical dots-per-inch assumed by LVGL for layout calculations.
+# The SSD1306 on the Corne is physically about 148 DPI at 128×32 / 0.87 in.
+# Setting an accurate DPI value keeps font sizes and spacing correct when using
+# density-independent units in LVGL layouts.
 config LV_DPI_DEF
 	default 148
 
+# Number of bits used to store each pixel in the framebuffer.
+# A monochrome OLED has only two states per pixel (on / off), so 1 bit per
+# pixel is all that is needed.  This slashes RAM consumption compared with
+# a 16-bit colour framebuffer.
 config LV_Z_BITS_PER_PIXEL
 	default 1
 
+# Select 1-bit monochrome as the LVGL colour depth.
+# Must match LV_Z_BITS_PER_PIXEL above.  With 1-bit colour, LVGL skips all
+# RGB blending math and writes pure black-or-white values, which is exactly
+# what the SSD1306 driver expects to receive.
 choice LV_COLOR_DEPTH
 	default LV_COLOR_DEPTH_1
 endchoice
 
 endif # LVGL
 
-endif
+endif # SHIELD_CORNE_LEFT || SHIELD_CORNE_RIGHT
 
+
+# ─── Custom display feature flag ─────────────────────────────────────────────
+
+# Boolean flag that gates compilation of the custom status screen.
+# When enabled (set to 'y' in corne_right.conf), CMakeLists.txt adds
+# custom_status_screen.c to the build.  That file provides the
+# zmk_display_status_screen() implementation that ZMK's display subsystem
+# calls when ZMK_DISPLAY_STATUS_SCREEN_CUSTOM=y.
+# depends on ZMK_DISPLAY ensures this option only appears (and takes effect)
+# when the display feature itself is active.
 config CORNE_CUSTOM_DISPLAY
 	bool "Custom Corne display"
 	depends on ZMK_DISPLAY
-

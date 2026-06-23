@@ -1,21 +1,82 @@
 /*
- * Copyright (c) 2020 Pete Johanson
+ * FILE: corne_left.overlay
  *
+ * Left-half hardware overlay for the Corne split keyboard.
+ * Applied on top of corne.dtsi when building firmware for the left controller.
+ *
+ * This file adds the two things that differ between halves:
+ *   1. Column GPIO assignments — the six pro_micro analog pins (A0–A5, labeled
+ *      D14–D21) wired to the key-matrix column traces on the left PCB.
+ *   2. Battery voltage sensing — the zmk,battery-nrf-vddh node, which reads the
+ *      nRF52840's internal VDDH rail (tied directly to the LiPo cell on the
+ *      nice!nano) to report battery percentage over BLE without a voltage divider.
+ *
+ * Edit this file when you need to:
+ *   - Re-pin the column GPIOs after a PCB revision
+ *   - Switch to a different battery measurement method
+ *   - Add any other hardware exclusive to the left half (encoder, extra GPIO)
+ *
+ * The right half uses corne_right.overlay, which has the same structure but
+ * reversed column pin order and col-offset = 6 on the matrix transform.
+ *
+ * Copyright (c) 2020 Pete Johanson
  * SPDX-License-Identifier: MIT
  */
 
+/* ─── Base Shield ────────────────────────────────────────────────────────────── */
+
+/* Pull in the shared Corne hardware definition: matrix transform, kscan row-gpios,
+ * I2C OLED, SPI RGB, and physical layout.  This overlay then adds the
+ * left-half-specific column GPIO assignments and battery sensing. */
 #include "corne.dtsi"
 
+/* ─── Key Scan — Left Column GPIOs ──────────────────────────────────────────── */
+
+/* The Corne wires its six columns to the pro_micro analog header pins
+ * (A0–A5, which also carry the digital labels D14–D21 on the nice!nano).
+ *
+ * Columns are driven high by the scan driver (col2row mode), so no pull
+ * resistor is needed — GPIO_ACTIVE_HIGH alone is sufficient.
+ *
+ * Left-half column ordering (outer → inner, pinky → index):
+ *   col 0 = D21 (A5) — outermost / pinky column
+ *   col 1 = D20 (A4) — ring-finger column
+ *   col 2 = D19 (A3) — middle-finger column
+ *   col 3 = D18 (A2) — index-finger column
+ *   col 4 = D15 (A1) — inner index column
+ *   col 5 = D14 (A0) — innermost column (closest to the split gap)
+ *
+ * This ordering reflects the physical trace routing on the left PCB.  The
+ * right half uses the exact reverse order because the PCB is flipped. */
 &kscan0 {
     col-gpios
+		/* Column 0 — pinky column (outermost left) */
 		= <&pro_micro 21 GPIO_ACTIVE_HIGH>
+		/* Column 1 — ring-finger column */
 		, <&pro_micro 20 GPIO_ACTIVE_HIGH>
+		/* Column 2 — middle-finger column */
 		, <&pro_micro 19 GPIO_ACTIVE_HIGH>
+		/* Column 3 — index-finger column */
 		, <&pro_micro 18 GPIO_ACTIVE_HIGH>
+		/* Column 4 — inner index column */
 		, <&pro_micro 15 GPIO_ACTIVE_HIGH>
+		/* Column 5 — innermost column (closest to the split gap) */
 		, <&pro_micro 14 GPIO_ACTIVE_HIGH>
 		;
 };
+
+/* ─── Battery — nRF VDDH Sensing ─────────────────────────────────────────────── */
+
+/* Reports battery percentage to the host over BLE.
+ *
+ * zmk,battery-nrf-vddh reads the nRF52840's internal VDDHDIV5 ADC channel,
+ * which is the VDDH supply rail divided by 5.  On the nice!nano, VDDH is
+ * connected directly to the LiPo cell (no external regulator between them),
+ * so the VDDH voltage tracks the battery: ~4.2 V fully charged, ~3.3 V empty.
+ *
+ * ZMK multiplies the divided reading back by 5, then maps the result to a
+ * percentage using a LiPo discharge curve.  No external voltage divider or
+ * extra resistors are needed — the measurement happens entirely inside the chip. */
 / {
     chosen {
       zmk,battery = &vbatt;

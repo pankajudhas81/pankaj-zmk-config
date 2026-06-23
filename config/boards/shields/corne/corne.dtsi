@@ -1,26 +1,97 @@
 /*
- * Copyright (c) 2020 Pete Johanson
+ * FILE: corne.dtsi
  *
+ * Shared hardware description for both halves of the Corne split keyboard.
+ * This file is included by corne_left.overlay and corne_right.overlay — it
+ * runs on every controller regardless of which side it is.
+ *
+ * It defines the complete shared hardware picture: the key-matrix transform
+ * (how switch positions map to key indices), the GPIO matrix scan driver with
+ * row pins, the I2C bus and SSD1306 OLED display, and the SPI-driven WS2812
+ * RGB LED strip with its pinctrl states.
+ *
+ * Edit this file when you need to:
+ *   - Change OLED or RGB hardware parameters (display size, LED count, timing)
+ *   - Adjust which nRF52840 pins drive rows, I2C, or the LED data line
+ *   - Modify the shared key-matrix layout (add/remove rows or columns)
+ *   - Change the ZMK chosen aliases (e.g. swap the display driver)
+ *
+ * Do NOT put left/right-specific pin assignments here — those belong in
+ * corne_left.overlay and corne_right.overlay respectively.
+ *
+ * Copyright (c) 2020 Pete Johanson
  * SPDX-License-Identifier: MIT
  */
+
+/* ─── Includes ──────────────────────────────────────────────────────────────── */
+
+/* LED color channel ordering constants — LED_COLOR_ID_GREEN, _RED, _BLUE.
+ * Used when configuring the WS2812 color-mapping property below. */
 #include <dt-bindings/led/led.h>
+
+/* RC(row, col) macro that expands to the logical key index for a given
+ * matrix position.  Used to fill the default_transform map array. */
 #include <dt-bindings/zmk/matrix_transform.h>
+
+/* Physical key layout and ZMK Studio position map for the Corne.
+ * Defines layout_0 and corne_position_map. */
 #include "corne-layouts.dtsi"
+
+/* ─── Root Chosen Aliases ────────────────────────────────────────────────────── */
+
+/* The "chosen" node wires named ZMK/Zephyr roles to the concrete hardware nodes
+ * defined in this file.  ZMK resolves these at build time — a missing or
+ * disabled target node is a compile error. */
 / {
 	chosen {
+		/* The Zephyr display subsystem will drive this node as the primary screen.
+		 * Points at the ssd1306@3c OLED node defined in the &pro_micro_i2c block
+		 * below.  Disable or re-point this when swapping in the nice!view. */
 		zephyr,display = &oled;
+
+		/* The key-scan driver ZMK should poll for switch events.
+		 * Points at kscan0, the GPIO matrix driver defined below. */
 		zmk,kscan = &kscan0;
+
+		/* The physical layout ZMK Studio uses to render the visual key editor.
+		 * Points at layout_0 from corne-layouts.dtsi, which encodes every key's
+		 * position, size, and rotation angle in physical space. */
 		zmk,physical-layout = &layout_0;
 	};
 
+/* ─── Matrix Transform ───────────────────────────────────────────────────────── */
+
+	/* Translates raw (row, col) switch closures from the kscan driver into the
+	 * sequential key indices that keymap layer arrays reference.
+	 *
+	 * The Corne presents a unified 12-column × 4-row logical matrix covering both
+	 * halves:
+	 *   Columns  0-5  = left half  (assigned by corne_left.overlay)
+	 *   Columns  6-11 = right half (assigned by corne_right.overlay, col-offset=6)
+	 *   Rows     0-2  = main key rows (top, home, bottom)
+	 *   Row      3    = thumb cluster
+	 *
+	 * The comment grid below shows the silk-screen switch labels (SW1…SW21) as
+	 * printed on the Corne PCB, with left/right halves separated by a gap. */
 	default_transform: keymap_transform_0 {
 		compatible = "zmk,matrix-transform";
+
+		/* Total logical columns across both halves combined. */
 		columns = <12>;
+
+		/* Total logical rows: 3 main rows + 1 thumb row. */
 		rows = <4>;
+
 // | SW1  | SW2  | SW3  | SW4  | SW5  | SW6  |   | SW6  | SW5  | SW4  | SW3  | SW2  | SW1  |
 // | SW7  | SW8  | SW9  | SW10 | SW11 | SW12 |   | SW12 | SW11 | SW10 | SW9  | SW8  | SW7  |
 // | SW13 | SW14 | SW15 | SW16 | SW17 | SW18 |   | SW18 | SW17 | SW16 | SW15 | SW14 | SW13 |
 //                      | SW19 | SW20 | SW21 |   | SW21 | SW20 | SW19 |
+
+		/* Each RC(row, col) expands to the logical key index for that position.
+		 * Row 0 = top row; Row 3 = thumb row.
+		 * Left half occupies columns 0-5; right half occupies columns 6-11.
+		 * The thumb row only has 3 keys per half — RC(3,0..2) and RC(3,9..11)
+		 * are intentionally absent (no key exists at those corners). */
 		map = <
 RC(0,0) RC(0,1) RC(0,2) RC(0,3) RC(0,4) RC(0,5)  RC(0,6)  RC(0,7) RC(0,8) RC(0,9) RC(0,10) RC(0,11)
 RC(1,0) RC(1,1) RC(1,2) RC(1,3) RC(1,4) RC(1,5)  RC(1,6)  RC(1,7) RC(1,8) RC(1,9) RC(1,10) RC(1,11)
@@ -29,22 +100,66 @@ RC(2,0) RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6)  RC(2,7) RC(2,8) RC(2,9
 		>;
 	};
 
+/* ─── Key Scan — GPIO Matrix ─────────────────────────────────────────────────── */
+
+	/* Scans the key matrix by driving columns high one at a time and reading the
+	 * four row lines to detect which switches are pressed.
+	 *
+	 * The col-gpios are NOT listed here — they differ between halves and are
+	 * injected by corne_left.overlay and corne_right.overlay respectively. */
 	 kscan0: kscan {
         compatible = "zmk,kscan-gpio-matrix";
+
+		/* Allow any keypress to wake the MCU out of deep sleep.
+		 * Without this flag the firmware cannot resume from sleep on a keypress. */
 		wakeup-source;
+
+        /* col2row: the scan driver drives each column output high in turn, then
+         * reads the row inputs to find closed switches.  Each switch connects a
+         * column pad to a row pad; the diode (col→row direction) prevents
+         * ghost keypresses when multiple keys in the same matrix neighborhood
+         * are held simultaneously.
+         * The alternative "row2col" reverses driver and sense roles. */
         diode-direction = "col2row";
+
+		/* Four row sense lines, shared across both halves.
+		 * These are the input pins that go high when a switch closes its column
+		 * to this row.
+		 *
+		 * GPIO_ACTIVE_HIGH: the line reads 1 (high) when a switch is pressed.
+		 * GPIO_PULL_DOWN: ties the idle line to GND so it does not float when
+		 *   no switch is pressed — a floating input would cause false key events.
+		 *
+		 * Pro Micro pin numbers D4–D7 are the logical header labels; ZMK maps
+		 * them to the nRF52840 port/pin numbers defined in the board files. */
 		row-gpios
+			/* D4 — Row 0 (top main row) */
 			= <&pro_micro 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+			/* D5 — Row 1 (home row) */
 			, <&pro_micro 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+			/* D6 — Row 2 (bottom main row) */
 			, <&pro_micro 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+			/* D7 — Row 3 (thumb cluster) */
 			, <&pro_micro 7 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
 			;
     };
 };
-// oled,I2c
+
+/* ─── I2C Pinctrl — OLED Display ─────────────────────────────────────────────── */
+
+/* The nRF52840 pinctrl system requires explicit pin assignments for each
+ * peripheral state transition.  The TWIM0 (I2C master) peripheral uses:
+ *   SDA (data)  = P0.17 — nice!nano header pin D1
+ *   SCL (clock) = P0.20 — nice!nano header pin D0
+ *
+ * IMPORTANT: these are the same physical pads that the nice!view SPI adapter
+ * uses for MOSI (P0.17) and SCK (P0.20).  Installing a nice!view requires
+ * disabling this I2C bus — see nice_nano_nrf52840_zmk.overlay. */
 &pinctrl {
        i2c0_default: i2c0_default {
                group1 {
+                       /* Active-state pin assignments: both SDA and SCL driven
+                        * by the TWIM peripheral at full drive strength. */
                        psels = <NRF_PSEL(TWIM_SDA, 0, 17)>,
                                <NRF_PSEL(TWIM_SCL, 0, 20)>;
                };
@@ -54,35 +169,97 @@ RC(2,0) RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6)  RC(2,7) RC(2,8) RC(2,9
                group1 {
                        psels = <NRF_PSEL(TWIM_SDA, 0, 17)>,
                                <NRF_PSEL(TWIM_SCL, 0, 20)>;
+                       /* low-power-enable puts the pads into high-impedance input
+                        * mode while the MCU sleeps.  This disconnects the internal
+                        * pull-ups and prevents current from leaking through the
+                        * OLED data lines into the display, which would drain the
+                        * battery even while the keyboard is idle. */
                        low-power-enable;
                };
        };
 };
 
 
+/* ─── OLED Display — SSD1306 ─────────────────────────────────────────────────── */
+
+/* Enables the I2C0 bus (aliased as pro_micro_i2c in the nice!nano board files)
+ * and registers the SSD1306 OLED controller on it. */
 &pro_micro_i2c {
     status = "okay";
 
+    /* The SSD1306 controller on the Corne OLED module.
+     * @3c is the 7-bit I2C address in hex — 0x3c is the default when the
+     * SA0 address-select pin is tied low on the OLED module. */
     oled: ssd1306@3c {
         compatible = "solomon,ssd1306fb";
+
+        /* 7-bit I2C bus address — must match the @3c node name above. */
         reg = <0x3c>;
+
+        /* Pixel resolution of the OLED panel.
+         * The Corne uses a common 128×32 px (0.91 inch) narrow OLED strip. */
         width = <128>;
         height = <32>;
+
+        /* Horizontal start column within the SSD1306's internal 132-column RAM.
+         * 0 = no offset; the first visible column maps to RAM column 0.
+         * Raise this if the image appears horizontally shifted on your panel. */
         segment-offset = <0>;
+
+        /* Which 8-row PAGE in display RAM corresponds to the first visible row.
+         * 0 = start at the top of RAM with no vertical page skip. */
         page-offset = <0>;
+
+        /* Vertical display shift applied by the COM output scan start command.
+         * 0 = no shift; COM0 maps directly to the topmost visible row. */
         display-offset = <0>;
+
+        /* Multiplex ratio = (number of active COM lines) − 1.
+         * For this 32-row panel: 32 − 1 = 31.  Setting this wrong vertically
+         * crops or doubles the image. */
         multiplex-ratio = <31>;
+
+        /* Mirror the column address so that the segment at address 127 is on
+         * the left as seen by the user.  Required for the physical orientation
+         * of the OLED on the Corne PCB; without it text appears left-right flipped. */
         segment-remap;
+
+        /* Scan COM lines from COM[N−1] down to COM0 (bottom-up in hardware).
+         * Combined with segment-remap this orients the display so (0,0) is
+         * the top-left corner when the OLED is mounted on the Corne. */
         com-invdir;
+
+        /* Use sequential COM pin configuration rather than the alternative
+         * interleaved wiring.  The 32-row OLED modules in the Corne BOM use
+         * sequential wiring; the wrong choice here shifts every other scan line. */
         com-sequential;
+
+        /* Invert all pixels: 0 in VRAM = pixel lit, 1 = pixel dark.
+         * Produces bright-on-dark (white text, black background), which reads
+         * more clearly in most keyboard-use lighting conditions. */
         inversion-on;
+
+        /* Pre-charge period register (SSD1306 command 0xD9).
+         * 0x22 = 0b0010_0010: phase-1 = 2 DCLKs, phase-2 = 2 DCLKs.
+         * Controls pixel charge/discharge timing between refresh cycles.
+         * 0x22 is the manufacturer reference value for a 3.3 V supply. */
         prechargep = <0x22>;
     };
 };
-// rgb,SPI
+
+/* ─── SPI Pinctrl — WS2812 RGB LEDs ─────────────────────────────────────────── */
+
+/* The WS2812 protocol is emulated over SPI: each WS2812 data bit is encoded
+ * as an 8-bit SPI frame (see spi-one-frame / spi-zero-frame in ws2812@0 below).
+ * Only MOSI is connected — the LED strip is strictly write-only.
+ *
+ *   MOSI = P0.6 — the dedicated RGB data pad on the nice!nano.
+ *   This pad is NOT exposed on the pro_micro header; it is wired directly
+ *   to the Corne PCB's LED data trace. */
 &pinctrl {
     spi3_default: spi3_default {
         group1 {
+            /* MOSI only — no SCK or MISO required for a one-wire LED protocol. */
             psels = <NRF_PSEL(SPIM_MOSI, 0, 6)>;
         };
     };
@@ -90,10 +267,16 @@ RC(2,0) RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6)  RC(2,7) RC(2,8) RC(2,9
     spi3_sleep: spi3_sleep {
         group1 {
             psels = <NRF_PSEL(SPIM_MOSI, 0, 6)>;
+            /* Disconnect MOSI from the SPIM peripheral during sleep so the
+             * pin does not drive current into the LED data line while the
+             * MCU is powered down.  Prevents slow battery drain through the
+             * first LED in the chain. */
             low-power-enable;
 		};
 	};
 };
+
+/* ─── WS2812 RGB LED Strip ───────────────────────────────────────────────────── */
 
 &spi3 {
 	compatible = "nordic,nrf-spim";
@@ -106,18 +289,56 @@ RC(2,0) RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6)  RC(2,7) RC(2,8) RC(2,9
 
 	led_strip: ws2812@0 {
 		compatible = "worldsemi,ws2812-spi";
+
 		/* SPI */
+
+		/* Device register — ignored by ws2812-spi because the strip has no
+		 * chip-select line, but the SPI bus binding requires a non-negative
+		 * reg value, so 0 is used as a placeholder. */
 		reg = <0>; /* ignored, but necessary for SPI bindings */
+
+		/* SPI clock frequency used to generate the WS2812 bit timing.
+		 * At 4 MHz each clock period = 250 ns.  With an 8-bit frame encoding
+		 * one WS2812 bit, total bit time = 8 × 250 ns = 2 µs — within the
+		 * WS2812B timing tolerance window. */
 		spi-max-frequency = <4000000>;
 
 		/* WS2812 */
+
+		/* Total WS2812 LEDs in the chain on this half of the keyboard.
+		 * 27 = 6 underglow LEDs (mounted beneath the PCB for ambient glow)
+		 *    + 21 per-key LEDs  (one under each switch, indices 6-26).
+		 * The underglow LEDs are first in the chain (indices 0-5); ZMK's
+		 * &rgb_ug behavior addresses all 27 by position when effects run. */
 		chain-length = <27>; /* There are per-key RGB, but the first 6 are underglow */
+
+		/* WS2812 data bits are encoded as 8-bit SPI frames at 4 MHz.
+		 * Each frame represents one WS2812 logic level:
+		 *
+		 *   spi-one-frame  = 0x70 = 0b01110000
+		 *     Three consecutive high clocks (3 × 250 ns ≈ 750 ns high)
+		 *     followed by five low clocks → encodes WS2812 logic "1".
+		 *
+		 *   spi-zero-frame = 0x40 = 0b01000000
+		 *     One high clock (1 × 250 ns ≈ 250 ns high)
+		 *     followed by seven low clocks → encodes WS2812 logic "0".
+		 *
+		 * Both frames fit within the WS2812B ±150 ns timing tolerance. */
 		spi-one-frame = <0x70>;
 		spi-zero-frame = <0x40>;
+
+		/* WS2812 LEDs receive color data in GRB byte order, not the usual RGB.
+		 * This mapping tells ZMK to reorder the red/green/blue bytes before
+		 * transmission so that requested colors match what the LEDs display. */
 		color-mapping = <LED_COLOR_ID_GREEN LED_COLOR_ID_RED LED_COLOR_ID_BLUE>;
 	};
 };
 
+/* ─── Underglow Chosen Alias ─────────────────────────────────────────────────── */
+
+/* A second root-level chosen block ties the LED strip node to ZMK's RGB
+ * underglow subsystem.  ZMK looks up zmk,underglow at boot to find the
+ * led_strip it should drive with &rgb_ug behaviors in the keymap. */
 / {
 	chosen {
 		zmk,underglow = &led_strip;

@@ -1,25 +1,87 @@
 /*
- * Copyright (c) 2020 Pete Johanson
+ * FILE: corne_right.overlay
  *
+ * Right-half hardware overlay for the Corne split keyboard.
+ * Applied on top of corne.dtsi when building firmware for the right controller.
+ *
+ * This file differs from corne_left.overlay in two important ways:
+ *   1. col-offset = 6 — both halves share a single 12-column logical matrix.
+ *      The right half must offset its columns by 6 so they occupy positions
+ *      6-11 instead of 0-5, which the left half already owns.
+ *   2. Column GPIO order is reversed — the Corne uses an identical PCB for
+ *      both sides (just physically flipped), so the same header pins trace to
+ *      columns in the opposite direction on the right half.
+ *
+ * Battery sensing is identical to the left half: each side has its own MCU
+ * and its own independent battery percentage reading via nRF VDDH.
+ *
+ * Edit this file when you need to:
+ *   - Re-pin the column GPIOs after a PCB revision
+ *   - Adjust col-offset if you change the total column count in corne.dtsi
+ *   - Add any hardware exclusive to the right half
+ *
+ * Copyright (c) 2020 Pete Johanson
  * SPDX-License-Identifier: MIT
  */
 
+/* ─── Base Shield ────────────────────────────────────────────────────────────── */
+
+/* Shared Corne hardware definition — same file used by the left half.
+ * This overlay then adds right-half-specific overrides on top. */
 #include "corne.dtsi"
 
+/* ─── Matrix Transform — Column Offset ──────────────────────────────────────── */
+
+/* The unified matrix is 12 columns wide (both halves combined).
+ * Columns 0-5 belong to the left half; columns 6-11 to the right half.
+ *
+ * col-offset = <6> tells ZMK to add 6 to every column number that the right
+ * half's kscan driver reports before looking the key up in the transform map.
+ * Without this offset, both halves would claim columns 0-5 and the right
+ * half's keys would shadow the left half's keys entirely in the keymap. */
 &default_transform {
 	col-offset = <6>;
 };
 
+/* ─── Key Scan — Right Column GPIOs ─────────────────────────────────────────── */
+
+/* Right-half column ordering (inner → outer, index → pinky).
+ * Notice this is the REVERSE of the left-half pin order.
+ * The Corne uses the same PCB for both halves (just flipped), so the physical
+ * column traces run in the opposite direction relative to the header.
+ *
+ *   col 6  = D14 (A0) — innermost column (closest to the split gap)
+ *   col 7  = D15 (A1) — inner index column
+ *   col 8  = D18 (A2) — index-finger column
+ *   col 9  = D19 (A3) — middle-finger column
+ *   col 10 = D20 (A4) — ring-finger column
+ *   col 11 = D21 (A5) — outermost / pinky column
+ *
+ * The col-offset = 6 block above shifts these into the 6-11 range so they
+ * correctly correspond to the right-half positions in the matrix transform. */
 &kscan0 {
     col-gpios
+        /* Column 6 — innermost column (index side, near center gap) */
         = <&pro_micro 14  GPIO_ACTIVE_HIGH>
+        /* Column 7 — inner index column */
         , <&pro_micro 15  GPIO_ACTIVE_HIGH>
+        /* Column 8 — index-finger column */
         , <&pro_micro 18  GPIO_ACTIVE_HIGH>
+        /* Column 9 — middle-finger column */
         , <&pro_micro 19  GPIO_ACTIVE_HIGH>
+        /* Column 10 — ring-finger column */
         , <&pro_micro 20  GPIO_ACTIVE_HIGH>
+        /* Column 11 — pinky column (outermost right) */
         , <&pro_micro 21  GPIO_ACTIVE_HIGH>
         ;
 };
+
+/* ─── Battery — nRF VDDH Sensing ─────────────────────────────────────────────── */
+
+/* Identical battery sensing node as the left half.
+ * Each half runs its own MCU with its own LiPo cell, so both sides report
+ * battery level independently over BLE.
+ * See corne_left.overlay for a full explanation of zmk,battery-nrf-vddh. */
 / {
     chosen {
       zmk,battery = &vbatt;

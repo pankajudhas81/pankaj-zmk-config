@@ -1,14 +1,68 @@
+# ═══════════════════════════════════════════════════════════════════
+# FILE: config/boards/shields/corne/corne.zmk.yml
+# ROLE: ZMK shield metadata — describes the Corne shield to the ZMK build system.
+#
+# Tells ZMK what this shield is, what hardware features it provides (keys,
+# display, underglow), what it requires (Nice!Nano), and what it exposes to
+# other shields (i2c_oled bus). The siblings list declares the left/right split
+# pair. ZMK reads this at build time to validate compatibility and populate the
+# hardware database used by zmk.dev and GitHub Actions.
+# ═══════════════════════════════════════════════════════════════════
+
+# Metadata schema version.  "1" is the only version currently defined by ZMK.
+# Do not change this unless ZMK publishes a new schema.
 file_format: "1"
+
+# Short machine-readable identifier for this shield.
+# This is the string you use in build commands and in build.yaml's `shield:`
+# field (e.g., `shield: corne_left`).  The left/right split variants are
+# listed under `siblings:` below and share this base id with a _left/_right
+# suffix baked into the shield's Kconfig files.
 id: corne
+
+# Human-readable display name shown in the ZMK hardware database and Studio UI.
 name: CORNE
+
+# "shield" means this is an add-on PCB (the actual switch matrix, OLED sockets,
+# RGB LEDs, etc.) that plugs into a separate MCU module.  Contrast with "board",
+# which describes a self-contained MCU module like the nice!nano itself.
+# When building, you always combine a board + one or more shields.
 type: shield
+
+# Upstream project URL for reference.
+# NOTE: this URL points to the TBK-Mini repo (a different keyboard by
+# Bastardkb) — that appears to be incorrect for a standard Corne, but the
+# value is preserved here as-is from the original metadata.
 url: https://github.com/Bastardkb/TBK-Mini
+
+# Board compatibility requirement.
+# This shield is designed for the nice!nano MCU module.  ZMK will refuse
+# to build a corne_left/right image unless the selected board satisfies
+# this requirement (i.e., declares Nice!Nano in its own .zmk.yml).
 requires: [Nice!Nano]
+
+# Hardware interfaces this shield exposes to other shields that may stack on top.
+# [i2c_oled] advertises that the Corne PCB routes an I2C bus to the OLED
+# socket.  The nice_view_adapter shield declares `requires: [i2c_oled]`,
+# which lets ZMK verify at build time that the adapter has something to
+# plug into before allowing the build to proceed.
 exposes: [i2c_oled]
+
+# Feature tags describing what hardware capabilities this shield provides.
+# ZMK uses these for filtering in its hardware database and Studio.
 features:
+  # Physical key switches wired to a matrix — the core of every keyboard.
   - keys
+  # OLED display socket wired via I2C (the standard SSD1306 0.91" screens).
   - display
+  # Per-key or underglow RGB LEDs (SK6812MINI-E or similar WS2812-compatible).
   - underglow
+
+# The two independent firmware images that make up this split keyboard.
+# ZMK uses this list to understand that corne_left and corne_right are
+# halves of the same board and should share a keymap, BLE pairing, etc.
+# Each sibling name corresponds to a shield variant with its own
+# corne_left.conf / corne_right.conf Kconfig overlay.
 siblings:
   - corne_left
   - corne_right
