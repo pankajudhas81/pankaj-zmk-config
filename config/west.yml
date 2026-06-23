@@ -1,11 +1,67 @@
+# ═══════════════════════════════════════════════════════════════════
+# FILE: config/west.yml
+# ROLE: West workspace manifest — pins the ZMK firmware repo and version for this build.
+#
+# West reads this file to fetch all firmware dependencies via `west update`.
+# Change `revision:` under the zmk project to upgrade or lock ZMK to a specific
+# commit hash or release tag. The `import: app/west.yml` line pulls in Zephyr,
+# all required HALs, and other build-time dependencies automatically, so only
+# ZMK itself needs to be listed here.
+# ═══════════════════════════════════════════════════════════════════
+
 manifest:
+
+  # ─── Remotes ─────────────────────────────────────────────────────────────────
+  #
+  # A "remote" is a named shorthand for a git hosting base URL.
+  # Instead of repeating the full GitHub org URL for every project, we
+  # define it once here and reference it by name below.
+
   remotes:
+
+    # The official ZMK firmware GitHub organisation.
+    # All ZMK-maintained repos live under this base URL.
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
+
+  # ─── Projects ────────────────────────────────────────────────────────────────
+  #
+  # Each entry here is a git repository that West will clone and keep in sync.
+
   projects:
+
+    # ZMK firmware — the core keyboard firmware this config is built on.
+    #
+    # revision: main
+    #   Tracks the tip of ZMK's main branch.  This is convenient for staying
+    #   current but means a `west update` can pull in breaking changes.
+    #   To pin a stable release, replace "main" with a specific commit hash
+    #   or a release tag (e.g. "v0.9.0" or "abc1234").
+    #
+    # import: app/west.yml
+    #   ZMK's own app/west.yml is automatically imported here.  That file
+    #   pulls in the Zephyr RTOS, all required HALs (hardware abstraction
+    #   layers), the Zephyr toolchain, and other build-time dependencies —
+    #   so we don't have to list them manually in this file.
     - name: zmk
       remote: zmkfirmware
       revision: main
       import: app/west.yml
+
+  # ─── Self ─────────────────────────────────────────────────────────────────────
+  #
+  # Tells West where THIS repository lives within the workspace directory tree.
+  # West workspaces have a conventional layout:
+  #
+  #   <workspace>/
+  #     zmk/          ← ZMK firmware (cloned by West)
+  #     config/       ← THIS repo (your personal keyboard config)
+  #     zephyr/       ← Zephyr RTOS (pulled in via ZMK's west.yml)
+  #     ...
+  #
+  # path: config  means West expects to find this repo at the "config/"
+  # subdirectory of the workspace root.  If you clone this repo somewhere
+  # else you may need to adjust this value.
+
   self:
     path: config
