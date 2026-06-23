@@ -1,7 +1,39 @@
+# ═══════════════════════════════════════════════════════════════════
+# FILE: config/boards/shields/nice_view_adapter/nice_view_adapter.zmk.yml
+# ROLE: ZMK shield metadata for the nice!view adapter — bridges Corne's I2C to the nice!view SPI display.
+#
+# The adapter sits between the Corne's i2c_oled interface and the nice!view
+# display, consuming i2c_oled and exposing nice_view_header. ZMK validates
+# this interface chain at build time: corne (exposes i2c_oled) → nice_view_adapter
+# (requires i2c_oled, exposes nice_view_header) → nice_view (requires nice_view_header).
+# ═══════════════════════════════════════════════════════════════════
+
+# Metadata schema version — must match what ZMK expects ("1" is current).
 file_format: "1"
+
+# Machine-readable identifier used in build.yaml's `shield:` field.
+# To use the nice!view you list all three: corne_left nice_view_adapter nice_view
 id: nice_view_adapter
+
+# Human-readable name shown in the ZMK hardware database.
 name: nice!view adapter
+
+# This is a shield (add-on PCB), not a standalone board.
 type: shield
+
+# Upstream reference for the nice!view hardware and documentation.
 url: https://nicekeyboards.com/nice-view
+
+# Interface this shield depends on being present in the build.
+# [i2c_oled] must be exposed by another shield already in the build — in
+# practice, the Corne shield satisfies this requirement (see corne.zmk.yml:
+# exposes: [i2c_oled]).  ZMK validates this chain at build time; if you try
+# to add nice_view_adapter without the corne shield the build will fail.
 requires: [i2c_oled]
+
+# Interface this shield provides to other shields stacked above it.
+# [nice_view_header] is the SPI-based connector interface that the ZMK
+# nice_view shield (the actual display driver) declares it requires.
+# This is how ZMK knows the three shields — corne, nice_view_adapter, and
+# nice_view — form a valid, fully-connected hardware stack.
 exposes: [nice_view_header]

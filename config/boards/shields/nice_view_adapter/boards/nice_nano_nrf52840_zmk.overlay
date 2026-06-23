@@ -1,6 +1,43 @@
+/*
+ * FILE: nice_nano_nrf52840_zmk.overlay  (nice_view_adapter shield)
+ *
+ * Hardware overlay that swaps the nice!view Sharp Memory LCD in and disables
+ * the SSD1306 OLED that corne.dtsi defines.
+ *
+ * The nice!view communicates over SPI0, not I2C.  On the nice!nano, the SPI0
+ * SCK and MOSI lines share the same physical pads (P0.20 and P0.17) that
+ * corne.dtsi already assigns to the I2C bus (SCL = P0.20, SDA = P0.17).  A pin
+ * can only belong to one peripheral at a time, so this overlay must explicitly
+ * disable both the I2C bus (pro_micro_i2c) and the OLED node before enabling
+ * the SPI0 bus and its pinctrl states.
+ *
+ * It also declares the "nice_view_spi" alias on spi0 and sets the chip-select
+ * pin (GPIO0 pin 8) that the nice!view shield driver expects to find.
+ *
+ * Edit this file when you need to:
+ *   - Change which SPI0 pins are routed to the nice!view connector
+ *   - Adjust the chip-select pin for a custom adapter board
+ *   - Add a second peripheral on the same SPI bus
+ *
+ * This overlay is only applied when the nice_view_adapter shield is listed in
+ * the build (configured via CONFIG_SHIELD in corne_left.conf / corne_right.conf).
+ */
+
+/* ─── SPI Pinctrl — nice!view Display ───────────────────────────────────────── */
+
+/* The nRF52840 pinctrl system requires explicit active and sleep pin states
+ * for every peripheral.  SPI0 uses three pins:
+ *
+ *   SCK  (clock) = P0.20 — shared pad with I2C SCL (see note in file header)
+ *   MOSI (data)  = P0.17 — shared pad with I2C SDA
+ *   MISO (unused by nice!view, required by SPI bus binding) = P0.25
+ *
+ * P0.25 is an internal pad on the nice!nano that is not exposed on the
+ * pro_micro header and is always free to serve as a dummy MISO line. */
 &pinctrl {
     spi0_default: spi0_default {
         group1 {
+            /* Active-state: all three SPI lines driven by the SPIM peripheral. */
             psels = <NRF_PSEL(SPIM_SCK, 0, 20)>,
                 <NRF_PSEL(SPIM_MOSI, 0, 17)>,
                 <NRF_PSEL(SPIM_MISO, 0, 25)>;
@@ -11,11 +48,23 @@
             psels = <NRF_PSEL(SPIM_SCK, 0, 20)>,
                 <NRF_PSEL(SPIM_MOSI, 0, 17)>,
                 <NRF_PSEL(SPIM_MISO, 0, 25)>;
+            /* Disconnect all three SPI pads from the peripheral during sleep.
+             * Prevents the SCK and MOSI lines from driving current into the
+             * nice!view panel while the MCU is powered down, which would
+             * cause battery drain through the display's input protection diodes. */
             low-power-enable;
         };
     };
 };
 
+/* ─── nice!view SPI Bus ───────────────────────────────────────────────────────── */
+
+/* Declares spi0 under the stable alias "nice_view_spi" so the nice!view shield
+ * driver can reference the bus by name regardless of the underlying bus number.
+ *
+ * cs-gpios: the chip-select line for the nice!view is GPIO port 0 pin 8.
+ * GPIO_ACTIVE_HIGH: the nice!view's CS input is asserted by driving it high
+ * (active-high CS, unlike the more common active-low convention). */
 nice_view_spi: &spi0 {
     compatible = "nordic,nrf-spim";
     pinctrl-0 = <&spi0_default>;
@@ -24,10 +73,25 @@ nice_view_spi: &spi0 {
     cs-gpios = <&gpio0 8 GPIO_ACTIVE_HIGH>;
 };
 
+/* ─── Disable Conflicting I2C OLED ──────────────────────────────────────────── */
+
+/* The SPI0 SCK (P0.20) and MOSI (P0.17) pins defined above are the same
+ * physical pads that corne.dtsi routes to the I2C bus (SCL and SDA).
+ * Both peripherals cannot own the same pins simultaneously, so the I2C bus
+ * and its OLED display node must be disabled whenever the nice!view is installed.
+ *
+ * Zephyr respects "status = disabled" at boot: the peripheral is not
+ * initialized and its pins are not claimed, freeing them for SPI0 to use. */
+
+/* Disable the TWIM0 I2C bus (aliased as pro_micro_i2c on the nice!nano).
+ * This releases P0.17 and P0.20 so SPI0 can claim them. */
 &pro_micro_i2c {
     status = "disabled";
 };
 
+/* Disable the SSD1306 OLED node that corne.dtsi registered on the I2C bus.
+ * Without this, Zephyr would attempt to initialize a display that is no
+ * longer electrically reachable and the boot would stall waiting for I2C ACKs. */
 &oled {
     status = "disabled";
 };

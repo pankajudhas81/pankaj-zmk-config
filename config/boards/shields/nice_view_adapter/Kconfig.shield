@@ -1,2 +1,18 @@
+# ═══════════════════════════════════════════════════════════════════
+# FILE: config/boards/shields/nice_view_adapter/Kconfig.shield
+# ROLE: Declares the SHIELD_NICE_VIEW_ADAPTER Kconfig symbol for the nice!view adapter.
+#
+# Same auto-detection pattern as the corne Kconfig.shield: the symbol is set
+# to true when "nice_view_adapter" appears in the SHIELD build variable, and
+# any Kconfig or overlay logic guarded on it is activated automatically.
+# You never edit this file — the value is derived from the build command.
+# ═══════════════════════════════════════════════════════════════════
+
+
+# ─── Adapter shield detection ─────────────────────────────────────────────────
+
+# Automatically true when "nice_view_adapter" appears in the SHIELD build
+# variable.  Enables the nice!view hardware overlay and associated Kconfig
+# defaults so the display is wired up without any extra user configuration.
 config SHIELD_NICE_VIEW_ADAPTER
-    def_bool $(shields_list_contains,nice_view_adapter)
+	def_bool $(shields_list_contains,nice_view_adapter)
