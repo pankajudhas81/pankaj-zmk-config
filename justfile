@@ -9,7 +9,7 @@ default:
 # Targets: left right left_view right_view reset
 build *targets:
     bash build.sh {{targets}}
-    command -v keymap >/dev/null && make svg || echo "==> keymap-drawer not installed; skipping SVG (run: make install)"
+    if command -v keymap >/dev/null 2>&1; then make svg || echo "==> SVG generation failed (see above); firmware is fine"; else echo "==> keymap-drawer not installed; run: pipx install --python python3.12 keymap-drawer==0.23.0"; fi
 
 # Regenerate corne_keymap.svg from config/corne.keymap (requires keymap-drawer: make install)
 svg:

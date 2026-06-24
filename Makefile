@@ -56,7 +56,7 @@ endif
 
 install: check-deps
 	@echo "==> Installing keymap-drawer..."
-	$(PIP) install --upgrade keymap-drawer
+	$(PIP) install keymap-drawer==0.23.0
 	@echo "==> Done."
 
 svg: $(SVG_FILE)
@@ -65,7 +65,7 @@ $(SVG_FILE): $(KEYMAP)
 	@echo "==> Parsing $(KEYMAP)..."
 	keymap parse -z $(KEYMAP) > $(YAML_FILE)
 	@echo "==> Drawing SVG -> $(SVG_FILE)..."
-	keymap draw $(YAML_FILE) > $(SVG_FILE)
+	keymap draw -n "33333+3 3+33333" $(YAML_FILE) > $(SVG_FILE)
 	@echo "==> Generated $(SVG_FILE) ($$(wc -c < $(SVG_FILE) | tr -d ' ') bytes)"
 
 viewer: $(HTML_FILE)
