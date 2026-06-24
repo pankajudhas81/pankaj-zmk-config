@@ -61,11 +61,11 @@ install: check-deps
 
 svg: $(SVG_FILE)
 
-$(SVG_FILE): $(KEYMAP)
+$(SVG_FILE): $(KEYMAP) config/keymap_drawer.config.yaml
 	@echo "==> Parsing $(KEYMAP)..."
-	keymap parse -z $(KEYMAP) > $(YAML_FILE)
+	keymap -c config/keymap_drawer.config.yaml parse -z $(KEYMAP) > $(YAML_FILE)
 	@echo "==> Drawing SVG -> $(SVG_FILE)..."
-	keymap draw -n "33333+3 3+33333" $(YAML_FILE) > $(SVG_FILE)
+	keymap -c config/keymap_drawer.config.yaml draw -n "33333+3 3+33333" $(YAML_FILE) > $(SVG_FILE)
 	@echo "==> Generated $(SVG_FILE) ($$(wc -c < $(SVG_FILE) | tr -d ' ') bytes)"
 
 viewer: $(HTML_FILE)

@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - "config/**/*.keymap"
+      - "keymap-viewer.html"
 
 concurrency:
   group: draw-keymap-${{ github.ref }}
@@ -23,13 +24,21 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
       - name: Install keymap-drawer
         run: pip install keymap-drawer==0.23.0
 
+      - name: Check keymap-viewer.html is in sync
+        run: node scripts/check-viewer-sync.js
+
       - name: Parse and draw keymap
         run: |
-          keymap parse -z config/corne.keymap > /tmp/corne_keymap.yaml
-          keymap draw /tmp/corne_keymap.yaml > corne_keymap.svg
+          keymap -c config/keymap_drawer.config.yaml parse -z config/corne.keymap > /tmp/corne_keymap.yaml
+          keymap -c config/keymap_drawer.config.yaml draw -n "33333+3 3+33333" /tmp/corne_keymap.yaml > corne_keymap.svg
 
       - name: Commit updated SVG
         run: |

@@ -1,0 +1,5 @@
+parse_config:
+  raw_binding_map:
+    "&display_tog":
+      t: DISP
+      h: TOG
