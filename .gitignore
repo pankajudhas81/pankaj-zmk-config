@@ -2,3 +2,13 @@
 practice.txt
 .claude/
 .venv/
+
+# ZMK local build workspace (created by `just build` / west)
+/zmk/
+/zephyr/
+/modules/
+/tools/
+/bootloader/
+/.west/
+/build/
+/optional/
