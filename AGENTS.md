@@ -1,3 +1,28 @@
+# Project Rules
+
+> Keep this section ABOVE the `<!-- gitnexus:start -->` / `<!-- gitnexus:end -->`
+> markers below. Everything between those markers is regenerated and overwritten
+> by `npx gitnexus analyze`, so rules placed inside them are lost.
+
+## keymap-viewer.html Must Track the Keymap
+
+`keymap-viewer.html` is a hand-maintained visual mirror of the keymap in
+`config/corne.keymap` (plus hardware/feature settings in `config/corne.conf`).
+It is NOT auto-generated.
+
+- ALWAYS update `keymap-viewer.html` in the SAME change whenever you edit layers,
+  key bindings, home row mods, thumb/layer assignments, or combos in
+  `config/corne.keymap`. A keymap edit is not complete until the viewer matches.
+- Mirror keymap changes into the JavaScript data inside `keymap-viewer.html`:
+  - The `layers` object (`base`, `nav`, `num`, `media`, `sym`, `fun`, `mouse`) —
+    each key's tap (`t`), hold (`h`), and `type`, kept in ZMK keymap order.
+  - The `combosDef` array — combo key positions and labels, matching any
+    `combos` block defined in the keymap.
+  - The sidebar header counts (`N keys · N layers · N combos`) and the `info-bar`
+    values (board, Bluetooth profiles, RGB LED count, home-row-mod tap time) when
+    the corresponding `config/corne.conf` or keymap settings change.
+- NEVER let `keymap-viewer.html` drift from `config/corne.keymap`.
+
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
