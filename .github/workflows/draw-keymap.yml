@@ -6,6 +6,10 @@ on:
     paths:
       - "config/**/*.keymap"
 
+concurrency:
+  group: draw-keymap-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   draw:
     runs-on: ubuntu-latest
@@ -20,7 +24,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install keymap-drawer
-        run: pip install keymap-drawer
+        run: pip install keymap-drawer==0.23.0
 
       - name: Parse and draw keymap
         run: |
