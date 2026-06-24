@@ -13,8 +13,8 @@ The SVG updates automatically on push via the [Draw Keymap](.github/workflows/dr
 
 ## Display
 
-- **Left (central):** Built-in ZMK status screen (layer, battery, BT)
-- **Right (peripheral):** Custom Trishul logo + battery + BT status
+- **Left (central):** Built-in ZMK status screen — output (USB/BT profile), battery %, active layer, and WPM
+- **Right (peripheral):** Custom Trishul logo + battery % + split/BT status
 
 ## Interactive Viewer
 

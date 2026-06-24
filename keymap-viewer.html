@@ -208,7 +208,6 @@
   .key-number { background: #1a2a2a; border-color: #2a4a4a; }
   .key-fn { background: #2a2a2a; border-color: #4a4a4a; }
   .key-bt { background: #0a2a4a; border-color: #0a4a7a; }
-  .key-rgb { background: #2a1a3a; border-color: #4a2a6a; }
   .key-mouse { background: #3a2a1a; border-color: #5a4a2a; }
 
 
@@ -433,7 +432,6 @@
     <div>Board: <span>Nice!Nano v2</span></div>
     <div>Shield: <span>Corne (split)</span></div>
     <div>Bluetooth: <span>4 profiles</span></div>
-    <div>RGB: <span>27 LEDs</span></div>
     <div>Home Row Mods: <span>200ms tap</span></div>
     <button class="raw-toggle" onclick="toggleRawPanel()">Raw Data</button>
   </div>
@@ -452,19 +450,19 @@
 const KW = 54, KH = 54, GAP = 4;
 const SPLIT_GAP = 220;
 
-// Physical positions for 42 keys.
+// Physical positions for 36 keys (outer-pinky column dropped from each half).
 // ZMK keymap order: left row 0, RIGHT row 0, left row 1, RIGHT row 1, left row 2, RIGHT row 2, left thumbs, right thumbs
-const colOffsetsL = [0, 0, -14, -21, -14, -7];
-const colOffsetsR = [-7, -14, -21, -14, 0, 0]; // mirrored
+const colOffsetsL = [0, -14, -21, -14, -7];
+const colOffsetsR = [-7, -14, -21, -14, 0]; // mirrored
 const positions = [];
 
 for (let row = 0; row < 3; row++) {
-  // Left half 6 keys
-  for (let col = 0; col < 6; col++) {
+  // Left half 5 keys
+  for (let col = 0; col < 5; col++) {
     positions.push({ x: col * 64, y: row * 64 + colOffsetsL[col], w: KW, h: KH, rot: 0 });
   }
-  // Right half 6 keys
-  for (let col = 0; col < 6; col++) {
+  // Right half 5 keys
+  for (let col = 0; col < 5; col++) {
     positions.push({ x: 570 + col * 64, y: row * 64 + colOffsetsR[col], w: KW, h: KH, rot: 0 });
   }
 }
@@ -481,12 +479,12 @@ const layers = {
   base: {
     icon: "B", color: "#e94560",
     keys: [
-      {},{t:"Q"},{t:"W"},{t:"E"},{t:"R"},{t:"T"},
-      {t:"Y"},{t:"U"},{t:"I"},{t:"O"},{t:"P"},{},
-      {},{t:"A",h:"CMD"},{t:"S",h:"OPT"},{t:"D",h:"CTRL"},{t:"F",h:"SHIFT"},{t:"G"},
-      {t:"H"},{t:"J",h:"SHIFT"},{t:"K",h:"CTRL"},{t:"L",h:"OPT"},{t:"'",h:"CMD"},{},
-      {},{t:"Z"},{t:"X"},{t:"C"},{t:"V"},{t:"B"},
-      {t:"N"},{t:"M"},{t:","},{t:"."},{t:"/"},{},
+      {t:"Q"},{t:"W"},{t:"E"},{t:"R"},{t:"T"},
+      {t:"Y"},{t:"U"},{t:"I"},{t:"O"},{t:"P"},
+      {t:"A",h:"CMD"},{t:"S",h:"OPT"},{t:"D",h:"CTRL"},{t:"F",h:"SHIFT"},{t:"G"},
+      {t:"H"},{t:"J",h:"SHIFT"},{t:"K",h:"CTRL"},{t:"L",h:"OPT"},{t:"'",h:"CMD"},
+      {t:"Z"},{t:"X"},{t:"C"},{t:"V"},{t:"B"},
+      {t:"N"},{t:"M"},{t:","},{t:"."},{t:"/"},
       {t:"ESC",h:"media",type:"layer"},{t:"SPACE",h:"nav",type:"layer"},{t:"TAB",h:"mouse",type:"layer"},
       {t:"ENTER",h:"sym",type:"layer"},{t:"BSPC",h:"num",type:"layer"},{t:"DEL",h:"fun",type:"layer"}
     ]
@@ -494,12 +492,12 @@ const layers = {
   nav: {
     icon: "V", color: "#eab308",
     keys: [
-      {},{},{},{},{},{},
-      {t:"REDO",type:"nav"},{t:"PASTE",type:"nav"},{t:"COPY",type:"nav"},{t:"CUT",type:"nav"},{t:"UNDO",type:"nav"},{},
-      {},{t:"LGUI",type:"mod"},{t:"LALT",type:"mod"},{t:"LCTRL",type:"mod"},{t:"LSHIFT",type:"mod"},{},
-      {t:"\u2190",type:"nav"},{t:"\u2193",type:"nav"},{t:"\u2191",type:"nav"},{t:"\u2192",type:"nav"},{t:"CAPS",type:"nav"},{},
-      {},{},{},{},{},{},
-      {t:"HOME",type:"nav"},{t:"PGDN",type:"nav"},{t:"PGUP",type:"nav"},{t:"END",type:"nav"},{t:"INS",type:"nav"},{},
+      {},{},{},{},{},
+      {t:"REDO",type:"nav"},{t:"PASTE",type:"nav"},{t:"COPY",type:"nav"},{t:"CUT",type:"nav"},{t:"UNDO",type:"nav"},
+      {t:"LGUI",type:"mod"},{t:"LALT",type:"mod"},{t:"LCTRL",type:"mod"},{t:"LSHIFT",type:"mod"},{},
+      {t:"\u2190",type:"nav"},{t:"\u2193",type:"nav"},{t:"\u2191",type:"nav"},{t:"\u2192",type:"nav"},{t:"CAPS",type:"nav"},
+      {},{},{},{},{},
+      {t:"HOME",type:"nav"},{t:"PGDN",type:"nav"},{t:"PGUP",type:"nav"},{t:"END",type:"nav"},{t:"INS",type:"nav"},
       {},{type:"held"},{},
       {t:"ENTER"},{t:"BSPC"},{t:"DEL"}
     ]
@@ -507,12 +505,12 @@ const layers = {
   num: {
     icon: "N", color: "#06b6d4",
     keys: [
-      {},{t:"[",type:"num"},{t:"7",type:"num"},{t:"8",type:"num"},{t:"9",type:"num"},{t:"]",type:"num"},
-      {},{},{},{},{},{},
-      {},{t:";",type:"num"},{t:"4",type:"num"},{t:"5",type:"num"},{t:"6",type:"num"},{t:"=",type:"num"},
-      {},{t:"RSHFT",type:"mod"},{t:"RCTRL",type:"mod"},{t:"RALT",type:"mod"},{t:"RGUI",type:"mod"},{},
-      {},{t:"`",type:"num"},{t:"1",type:"num"},{t:"2",type:"num"},{t:"3",type:"num"},{t:"\\",type:"num"},
-      {},{},{},{},{},{},
+      {t:"[",type:"num"},{t:"7",type:"num"},{t:"8",type:"num"},{t:"9",type:"num"},{t:"]",type:"num"},
+      {},{},{},{},{},
+      {t:";",type:"num"},{t:"4",type:"num"},{t:"5",type:"num"},{t:"6",type:"num"},{t:"=",type:"num"},
+      {},{t:"RSHFT",type:"mod"},{t:"RCTRL",type:"mod"},{t:"RALT",type:"mod"},{t:"RGUI",type:"mod"},
+      {t:"`",type:"num"},{t:"1",type:"num"},{t:"2",type:"num"},{t:"3",type:"num"},{t:"\\",type:"num"},
+      {},{},{},{},{},
       {t:".",type:"num"},{t:"0",type:"num"},{t:"-",type:"num"},
       {},{type:"held"},{}
     ]
@@ -520,12 +518,12 @@ const layers = {
   media: {
     icon: "M", color: "#f6a623",
     keys: [
-      {},{},{},{},{},{},
-      {t:"RGB\nTOG",type:"rgb"},{t:"RGB\nEFF",type:"rgb"},{t:"RGB\nHUE+",type:"rgb"},{t:"RGB\nSAT+",type:"rgb"},{},{},
-      {},{t:"LGUI",type:"mod"},{t:"LALT",type:"mod"},{t:"LCTRL",type:"mod"},{t:"LSHIFT",type:"mod"},{},
-      {t:"EP TOG",type:"media"},{t:"PREV",type:"media"},{t:"VOL-",type:"media"},{t:"VOL+",type:"media"},{t:"NEXT",type:"media"},{},
-      {},{},{},{},{},{},
-      {t:"OUT\nTOG",type:"bt"},{t:"BT 0",type:"bt"},{t:"BT 1",type:"bt"},{t:"BT 2",type:"bt"},{t:"BT 3",type:"bt"},{},
+      {},{},{},{},{},
+      {},{},{},{},{},
+      {t:"LGUI",type:"mod"},{t:"LALT",type:"mod"},{t:"LCTRL",type:"mod"},{t:"LSHIFT",type:"mod"},{},
+      {t:"EP TOG",type:"media"},{t:"PREV",type:"media"},{t:"VOL-",type:"media"},{t:"VOL+",type:"media"},{t:"NEXT",type:"media"},
+      {},{},{},{},{},
+      {t:"OUT\nTOG",type:"bt"},{t:"BT 0",type:"bt"},{t:"BT 1",type:"bt"},{t:"BT 2",type:"bt"},{t:"BT 3",type:"bt"},
       {type:"held"},{},{},
       {t:"STOP",type:"media"},{t:"PLAY\nPAUSE",type:"media"},{t:"MUTE",type:"media"}
     ]
@@ -533,12 +531,12 @@ const layers = {
   sym: {
     icon: "S", color: "#a855f7",
     keys: [
-      {},{t:"{",type:"sym"},{t:"&",type:"sym"},{t:"*",type:"sym"},{t:"(",type:"sym"},{t:"}",type:"sym"},
-      {},{},{},{},{},{},
-      {},{t:":",type:"sym"},{t:"$",type:"sym"},{t:"%",type:"sym"},{t:"^",type:"sym"},{t:"+",type:"sym"},
-      {},{t:"RSHFT",type:"mod"},{t:"RCTRL",type:"mod"},{t:"RALT",type:"mod"},{t:"RGUI",type:"mod"},{},
-      {},{t:"~",type:"sym"},{t:"!",type:"sym"},{t:"@",type:"sym"},{t:"#",type:"sym"},{t:"|",type:"sym"},
-      {},{},{},{},{},{},
+      {t:"{",type:"sym"},{t:"&",type:"sym"},{t:"*",type:"sym"},{t:"(",type:"sym"},{t:"}",type:"sym"},
+      {},{},{},{},{},
+      {t:":",type:"sym"},{t:"$",type:"sym"},{t:"%",type:"sym"},{t:"^",type:"sym"},{t:"+",type:"sym"},
+      {},{t:"RSHFT",type:"mod"},{t:"RCTRL",type:"mod"},{t:"RALT",type:"mod"},{t:"RGUI",type:"mod"},
+      {t:"~",type:"sym"},{t:"!",type:"sym"},{t:"@",type:"sym"},{t:"#",type:"sym"},{t:"|",type:"sym"},
+      {},{},{},{},{},
       {t:"(",type:"sym"},{t:")",type:"sym"},{t:"_",type:"sym"},
       {type:"held"},{},{}
     ]
@@ -546,12 +544,12 @@ const layers = {
   fun: {
     icon: "F", color: "#22c55e",
     keys: [
-      {},{t:"F12",type:"fn"},{t:"F7",type:"fn"},{t:"F8",type:"fn"},{t:"F9",type:"fn"},{t:"PSCRN",type:"fn"},
-      {},{},{},{},{},{},
-      {},{t:"F11",type:"fn"},{t:"F4",type:"fn"},{t:"F5",type:"fn"},{t:"F6",type:"fn"},{t:"SLCK",type:"fn"},
-      {},{t:"RSHFT",type:"mod"},{t:"RCTRL",type:"mod"},{t:"RALT",type:"mod"},{t:"RGUI",type:"mod"},{},
-      {},{t:"F10",type:"fn"},{t:"F1",type:"fn"},{t:"F2",type:"fn"},{t:"F3",type:"fn"},{t:"PAUSE",type:"fn"},
-      {},{},{},{},{},{},
+      {t:"F12",type:"fn"},{t:"F7",type:"fn"},{t:"F8",type:"fn"},{t:"F9",type:"fn"},{t:"PSCRN",type:"fn"},
+      {},{},{},{},{},
+      {t:"F11",type:"fn"},{t:"F4",type:"fn"},{t:"F5",type:"fn"},{t:"F6",type:"fn"},{t:"SLCK",type:"fn"},
+      {},{t:"RSHFT",type:"mod"},{t:"RCTRL",type:"mod"},{t:"RALT",type:"mod"},{t:"RGUI",type:"mod"},
+      {t:"F10",type:"fn"},{t:"F1",type:"fn"},{t:"F2",type:"fn"},{t:"F3",type:"fn"},{t:"PAUSE",type:"fn"},
+      {},{},{},{},{},
       {t:"K_APP"},{t:"SPACE"},{t:"TAB"},
       {},{},{type:"held"}
     ]
@@ -559,12 +557,12 @@ const layers = {
   mouse: {
     icon: "P", color: "#f97316",
     keys: [
-      {},{},{},{},{},{},
-      {},{},{},{},{},{},
-      {},{t:"LGUI",type:"mod"},{t:"LALT",type:"mod"},{t:"LCTRL",type:"mod"},{t:"LSHIFT",type:"mod"},{},
-      {t:"\u2190",type:"mouse"},{t:"\u2193",type:"mouse"},{t:"\u2191",type:"mouse"},{t:"\u2192",type:"mouse"},{},{},
-      {},{},{},{},{},{},
-      {t:"SCRL\n\u2190",type:"mouse"},{t:"SCRL\n\u2193",type:"mouse"},{t:"SCRL\n\u2191",type:"mouse"},{t:"SCRL\n\u2192",type:"mouse"},{},{},
+      {},{},{},{},{},
+      {},{},{},{},{},
+      {t:"LGUI",type:"mod"},{t:"LALT",type:"mod"},{t:"LCTRL",type:"mod"},{t:"LSHIFT",type:"mod"},{},
+      {t:"\u2190",type:"mouse"},{t:"\u2193",type:"mouse"},{t:"\u2191",type:"mouse"},{t:"\u2192",type:"mouse"},{},
+      {},{},{},{},{},
+      {t:"SCRL\n\u2190",type:"mouse"},{t:"SCRL\n\u2193",type:"mouse"},{t:"SCRL\n\u2191",type:"mouse"},{t:"SCRL\n\u2192",type:"mouse"},{},
       {},{},{type:"held"},
       {t:"MCLK",type:"mouse"},{t:"LCLK",type:"mouse"},{t:"RCLK",type:"mouse"}
     ]
@@ -574,7 +572,7 @@ const layers = {
 
 const layerDescriptions = {
   base: "Default QWERTY with home row mods",
-  media: "Media controls, RGB, Bluetooth",
+  media: "Media controls, Bluetooth",
   sym: "Symbols and special characters",
   num: "Number pad and math operators",
   nav: "Navigation, arrows, clipboard",
@@ -600,7 +598,6 @@ function getKeyClass(key) {
   if (key.type === 'layer') return 'key-layer';
   if (key.type === 'mod') return 'key-mod';
   if (key.type === 'bt') return 'key-bt';
-  if (key.type === 'rgb') return 'key-rgb';
   if (key.type === 'media') return 'key-media';
   if (key.type === 'nav') return 'key-nav';
   if (key.type === 'sym') return 'key-symbol';

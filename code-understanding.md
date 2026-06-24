@@ -11,7 +11,7 @@ ZMK firmware config for a Corne split keyboard (42 keys, 2 halves, wireless via 
 ```
 build.yaml                        — build matrix (what GitHub Actions compiles)
 config/
-  corne.conf                      — master keyboard config (behaviour, power, RGB)
+  corne.conf                      — master keyboard config (behaviour, power)
   corne.keymap                    — all keybindings and layer definitions
   west.yml                        — ZMK firmware version pin
   corne.json                      — physical key layout for the keymap viewer
