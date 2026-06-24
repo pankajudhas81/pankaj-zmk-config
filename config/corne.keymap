@@ -330,7 +330,8 @@
         //   This is the "system settings" layer — everything that changes how the
         //   keyboard behaves or what it connects to lives here.
         //
-        //   Right hand — top row: unused (&none).
+        //   Right hand — top row: screen brightness — BRI_DN / BRI_UP sit directly
+        //   above the C_VOL_DN / C_VOL_UP keys. The other three top-row keys are unused (&none).
         //
         //   Right hand — home row (system-level controls):
         //     DISP_TOG — toggle OLED display blanking (0xAE off / 0xAF on; VCC stays up, no reinit bug)
@@ -347,7 +348,7 @@
         //   Left hand: bare held modifiers (same pattern as NAV/NUM).
         //
         // ┌─────────┬─────────┬─────────┬─────────┬─────────┐   ┌─────────┬─────────┬─────────┬─────────┬─────────┐
-        // │   ---   │   ---   │   ---   │   ---   │   ---   │   │   ---   │   ---   │   ---   │   ---   │   ---   │
+        // │   ---   │   ---   │   ---   │   ---   │   ---   │   │   ---   │   ---   │ BRI_DN  │ BRI_UP  │   ---   │
         // ├─────────┼─────────┼─────────┼─────────┼─────────┤   ├─────────┼─────────┼─────────┼─────────┼─────────┤
         // │   GUI   │   ALT   │  CTRL   │  SHFT   │   ---   │   │DISP_TOG │ C_PREV  │ VOL_DN  │ VOL_UP  │ C_NEXT  │
         // ├─────────┼─────────┼─────────┼─────────┼─────────┤   ├─────────┼─────────┼─────────┼─────────┼─────────┤
@@ -359,7 +360,7 @@
         media_layer {
             display-name = "MEDIA";
             bindings = <
-&none       &none       &none         &none         &none          &none          &none          &none          &none          &none
+&none       &none       &none         &none         &none          &none          &none          &kp C_BRI_DN   &kp C_BRI_UP   &none
 &kp LGUI    &kp LALT    &kp LCTRL     &kp LSHFT     &none          &display_tog   &kp C_PREV  &kp C_VOL_DN  &kp C_VOL_UP &kp C_NEXT
 &none       &none       &none         &none         &none          &out OUT_TOG &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2 &bt BT_SEL 3
                         &none         &none         &none          &kp C_STOP  &kp C_PP      &kp C_MUTE
