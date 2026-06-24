@@ -60,26 +60,6 @@ Each layer concentrates its keys on one hand so the other hand is free to hold t
 
 ---
 
-## Combos
-
-| Keys | Output |
-|------|--------|
-| W + E | Escape |
-| I + O | Backspace |
-| O + P | Delete |
-| S + D | Tab |
-| K + L | Enter |
-| F + J | Caps Word |
-| X + C | Cmd+C (copy) |
-| C + V | Cmd+V (paste) |
-| X + V | Cmd+X (cut) |
-| J + M (vertical) | - |
-| H + N (vertical) | _ |
-| F + V (vertical) | = |
-| S + X (vertical) | ` |
-| L + ' | ; |
-
----
 
 ## How to change keybindings
 
