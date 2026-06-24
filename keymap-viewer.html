@@ -426,7 +426,7 @@
 <div class="sidebar">
   <div class="sidebar-header">
     <h1>Corne Keymap</h1>
-    <div class="subtitle">42 keys &middot; 7 layers &middot; 14 combos</div>
+    <div class="subtitle">42-key board &middot; 36-key layout &middot; 7 layers</div>
   </div>
   <div class="sidebar-section">Layers</div>
   <div class="layer-list" id="layerList"></div>
@@ -505,12 +505,12 @@ const layers = {
   base: {
     icon: "B", color: "#e94560",
     keys: [
-      {t:"TAB"},{t:"Q"},{t:"W"},{t:"E"},{t:"R"},{t:"T"},
-      {t:"Y"},{t:"U"},{t:"I"},{t:"O"},{t:"P"},{t:"BSPC"},
-      {t:"ESC",h:"CTRL"},{t:"A",h:"CMD"},{t:"S",h:"OPT"},{t:"D",h:"CTRL"},{t:"F",h:"SHIFT"},{t:"G"},
-      {t:"H"},{t:"J",h:"SHIFT"},{t:"K",h:"CTRL"},{t:"L",h:"OPT"},{t:"'",h:"CMD"},{t:"HYPR"},
-      {t:"LSHFT"},{t:"Z"},{t:"X"},{t:"C"},{t:"V"},{t:"B"},
-      {t:"N"},{t:"M"},{t:","},{t:"."},{t:"/"},{t:"ESC"},
+      {},{t:"Q"},{t:"W"},{t:"E"},{t:"R"},{t:"T"},
+      {t:"Y"},{t:"U"},{t:"I"},{t:"O"},{t:"P"},{},
+      {},{t:"A",h:"CMD"},{t:"S",h:"OPT"},{t:"D",h:"CTRL"},{t:"F",h:"SHIFT"},{t:"G"},
+      {t:"H"},{t:"J",h:"SHIFT"},{t:"K",h:"CTRL"},{t:"L",h:"OPT"},{t:"'",h:"CMD"},{},
+      {},{t:"Z"},{t:"X"},{t:"C"},{t:"V"},{t:"B"},
+      {t:"N"},{t:"M"},{t:","},{t:"."},{t:"/"},{},
       {t:"ESC",h:"media",type:"layer"},{t:"SPACE",h:"nav",type:"layer"},{t:"TAB",h:"mouse",type:"layer"},
       {t:"ENTER",h:"sym",type:"layer"},{t:"BSPC",h:"num",type:"layer"},{t:"DEL",h:"fun",type:"layer"}
     ]
@@ -535,7 +535,7 @@ const layers = {
       {},{},{},{},{},{},
       {},{t:";",type:"num"},{t:"4",type:"num"},{t:"5",type:"num"},{t:"6",type:"num"},{t:"=",type:"num"},
       {},{t:"RSHFT",type:"mod"},{t:"RCTRL",type:"mod"},{t:"RALT",type:"mod"},{t:"RGUI",type:"mod"},{},
-      {},{t:"~",type:"num"},{t:"1",type:"num"},{t:"2",type:"num"},{t:"3",type:"num"},{t:"\\",type:"num"},
+      {},{t:"`",type:"num"},{t:"1",type:"num"},{t:"2",type:"num"},{t:"3",type:"num"},{t:"\\",type:"num"},
       {},{},{},{},{},{},
       {t:".",type:"num"},{t:"0",type:"num"},{t:"-",type:"num"},
       {},{type:"held"},{}
@@ -549,7 +549,7 @@ const layers = {
       {},{t:"LGUI",type:"mod"},{t:"LALT",type:"mod"},{t:"LCTRL",type:"mod"},{t:"LSHIFT",type:"mod"},{},
       {t:"EP TOG",type:"media"},{t:"PREV",type:"media"},{t:"VOL-",type:"media"},{t:"VOL+",type:"media"},{t:"NEXT",type:"media"},{},
       {},{},{},{},{},{},
-      {t:"OUT\nTOG",type:"bt"},{t:"BT 0",type:"bt"},{t:"BT 1",type:"bt"},{t:"BT 2",type:"bt"},{t:"BT 3",type:"bt"},{t:"BT CLR\nALL",type:"bt"},
+      {t:"OUT\nTOG",type:"bt"},{t:"BT 0",type:"bt"},{t:"BT 1",type:"bt"},{t:"BT 2",type:"bt"},{t:"BT 3",type:"bt"},{},
       {type:"held"},{},{},
       {t:"STOP",type:"media"},{t:"PLAY\nPAUSE",type:"media"},{t:"MUTE",type:"media"}
     ]
