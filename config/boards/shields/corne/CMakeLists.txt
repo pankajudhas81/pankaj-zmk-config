@@ -32,3 +32,12 @@ if(CONFIG_CORNE_CUSTOM_DISPLAY)
   zephyr_library_sources(src/custom_status_screen.c)
 
 endif()
+
+# Display-blanking toggle behavior: compiled on every half that has a display.
+# Both corne_left and corne_right set CONFIG_ZMK_DISPLAY=y, so this compiles
+# on both sides.  Each half toggles its own DEVICE_DT_GET(DT_CHOSEN(zephyr_display)).
+if(CONFIG_ZMK_DISPLAY)
+  zephyr_library_named(corne_behavior_display_toggle)
+  zephyr_library_include_directories(${CMAKE_SOURCE_DIR}/include)
+  zephyr_library_sources(src/behavior_display_toggle.c)
+endif()

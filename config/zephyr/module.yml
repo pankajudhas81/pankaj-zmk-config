@@ -1,0 +1,4 @@
+name: yuyudhan-zmk-config
+build:
+  settings:
+    dts_root: .

@@ -1,0 +1,11 @@
+# Copyright (c) 2024 Ankur
+# SPDX-License-Identifier: MIT
+
+description: >
+  Toggle OLED display blanking (SSD1306 0xAE / 0xAF) without cutting the
+  ext-power rail.  The display controller stays powered so it reliably
+  re-initialises on the second press, sidestepping ZMK issue #674.
+
+compatible: "zmk,behavior-display-toggle"
+
+include: zero_param.yaml
