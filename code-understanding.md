@@ -15,7 +15,7 @@ config/
   corne.conf                      — master keyboard config (behaviour, power)
   corne.keymap                    — all keybindings and layer definitions
   west.yml                        — ZMK firmware version pin
-  corne.json                      — physical key layout for the keymap viewer
+  corne.json                      — QMK-style physical-layout JSON (currently unused by the build/viewer tooling)
   boards/shields/corne/
     corne.dtsi                    — shared hardware: matrix, OLED, RGB wiring
     corne_left.conf/.overlay      — left-half (central/USB) overrides
@@ -25,6 +25,9 @@ config/
     Kconfig.shield                — shield name detection
     CMakeLists.txt                — builds custom right-half display
     src/custom_status_screen.c    — custom OLED layout (Trishul + battery + BLE)
+    src/behavior_display_toggle.c — custom display-blanking toggle behavior
+  dts/bindings/behaviors/
+    zmk,behavior-display-toggle.yaml — devicetree binding for the display-toggle behavior
   boards/shields/nice_view_adapter/
                                   — swap-in adapter for nice!view display
 ```
@@ -48,14 +51,14 @@ The layout follows a 7-layer Miryoku-style design. Activating a layer is always 
 | Layer | Thumb key | Hand |
 |-------|-----------|------|
 | BASE  | —         | both |
-| NAV   | Space     | right thumb; nav keys on right |
-| NUM   | Backspace | left thumb; numpad on left |
-| MEDIA | Escape    | right thumb; media keys on right |
-| SYM   | Enter     | left thumb; symbols on left |
-| FUN   | Delete    | left thumb; F-keys on left |
-| MOUSE | Tab       | right thumb; mouse keys on right |
+| NAV   | Space     | left thumb; nav keys on right |
+| NUM   | Backspace | right thumb; numpad on left |
+| MEDIA | Escape    | left thumb; media keys on right |
+| SYM   | Enter     | right thumb; symbols on left |
+| FUN   | Delete    | right thumb; F-keys on left |
+| MOUSE | Tab       | left thumb; mouse keys on right |
 
-**Home row mods (BASE layer):** Hold `A/S/D/F` for `GUI/Alt/Ctrl/Shift` (left hand); mirror on `J/K/L/;` for the right hand. Tap for the letter, hold for the modifier.
+**Home row mods (BASE layer):** Hold `A/S/D/F` for `GUI/Alt/Ctrl/Shift` (left hand); mirror on `J/K/L/'` for the right hand. Tap for the letter, hold for the modifier.
 
 Each layer concentrates its keys on one hand so the other hand is free to hold the activating thumb key.
 
@@ -96,7 +99,7 @@ These files describe physical hardware wiring and build plumbing. Only touch the
 
 - `config/boards/shields/corne/corne.dtsi` — matrix rows/cols, OLED, RGB wiring
 - `config/boards/shields/corne/corne-layouts.dtsi` — physical key positions for ZMK Studio
-- `config/corne.zmk.yml` — shield metadata
+- `config/boards/shields/corne/corne.zmk.yml` — shield metadata
 - `config/boards/shields/corne/Kconfig.defconfig` — auto-applied Kconfig defaults
 - `config/boards/shields/corne/Kconfig.shield` — shield detection logic
 - `config/boards/shields/corne/CMakeLists.txt` — build rules for the custom display source
