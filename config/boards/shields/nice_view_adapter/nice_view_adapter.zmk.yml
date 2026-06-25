@@ -13,7 +13,7 @@
 # Metadata schema version — must match what ZMK expects ("1" is current).
 file_format: "1"
 
-# Machine-readable identifier used in build.yaml's `shield:` field.
+# Machine-readable identifier used in build commands as the shield name.
 # To use the nice!view you list all three: corne_left nice_view_adapter nice_view
 id: nice_view_adapter
 

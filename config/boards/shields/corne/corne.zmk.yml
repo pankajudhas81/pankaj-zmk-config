@@ -8,7 +8,7 @@
 # display, underglow), what it requires (Nice!Nano), and what it exposes to
 # other shields (i2c_oled bus). The siblings list declares the left/right split
 # pair. ZMK reads this at build time to validate compatibility and populate the
-# hardware database used by zmk.dev and GitHub Actions.
+# hardware database used by zmk.dev.
 # ═══════════════════════════════════════════════════════════════════
 
 # Metadata schema version.  "1" is the only version currently defined by ZMK.
@@ -16,8 +16,8 @@
 file_format: "1"
 
 # Short machine-readable identifier for this shield.
-# This is the string you use in build commands and in build.yaml's `shield:`
-# field (e.g., `shield: corne_left`).  The left/right split variants are
+# This is the string you use in build commands (e.g., `corne_left` or `corne_right`).
+# The left/right split variants are
 # listed under `siblings:` below and share this base id with a _left/_right
 # suffix baked into the shield's Kconfig files.
 id: corne
