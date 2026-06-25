@@ -53,9 +53,11 @@ git) as `corne_left.uf2`, `corne_right.uf2`, `corne_left_nice_view.uf2`, `corne_
 ## Regenerate Keymap SVG
 
 ```sh
-make install   # one-time: pip install keymap-drawer
+make install   # one-time: pip install keymap-drawer==0.23.0
 make svg       # parse + render SVG
 ```
+
+> Alternatively, isolate it with pipx: `pipx install --python python3.12 keymap-drawer==0.23.0`
 
 ## Hardware
 
