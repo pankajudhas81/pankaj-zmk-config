@@ -8,21 +8,23 @@
  *
  * Custom ZMK behavior: toggles the OLED display's hardware blanking state
  * (SSD1306 commands 0xAE = off / 0xAF = on) without cutting the ext-power
- * rail.  The display controller stays powered so the display reliably comes
- * back on the second press — this sidesteps ZMK issue #674 (display not
- * re-initialising after VCC is cut by ext_power EP_TOG).
+ * rail.  VCC is never cut — the display controller stays powered the entire
+ * time, so 0xAF reliably restores the panel.
  *
  * Locality: BEHAVIOR_LOCALITY_GLOBAL — both central and peripheral halves
  * execute this binding, each toggling their own DT_CHOSEN(zephyr_display)
  * device.  State is tracked per-side via a static bool (one per compiled
  * firmware image), initialised false = display on, which matches boot state.
  *
- * Known edge case: ZMK's display/main.c calls display_blanking_off() on every
- * ZMK_ACTIVITY_IDLE → ZMK_ACTIVITY_ACTIVE transition (main.c:176-177).  If
- * the keyboard sits idle past CONFIG_ZMK_IDLE_TIMEOUT and a key is then
- * pressed, the display will wake even if it was manually blanked here.  This
- * only matters after the full idle timeout (~10 min by default) and is
- * expected behaviour — the display returns to its natural active state.
+ * IMPORTANT — sole-owner design: correct round-tripping requires that
+ * CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE=n is set in config/corne.conf (it is).
+ * Without that override, ZMK defaults BLANK_ON_IDLE to 'y' for SSD1306, and
+ * its idle activity handler calls display_blanking_off() on every
+ * IDLE→ACTIVE transition, desyncing the handler's state from the hardware
+ * so the toggle hits the wrong branch and leaves the screen stuck off.
+ * With BLANK_ON_IDLE=n the activity listener is compiled out and this
+ * behavior is the only code that ever changes the blank state (deep sleep
+ * still powers the whole board down after the sleep timeout as usual).
  */
 
 #define DT_DRV_COMPAT zmk_behavior_display_toggle
