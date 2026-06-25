@@ -10,23 +10,23 @@
 
 ## keymap-viewer.html Must Track the Keymap
 
-`keymap-viewer.html` is a hand-maintained visual mirror of the keymap in
-`config/corne.keymap` (plus hardware/feature settings in `config/corne.conf`).
-It is NOT auto-generated.
+The `layers` data block in `keymap-viewer.html` is **generated** by `just html`
+(`scripts/gen-viewer.js`) from `config/corne.keymap`. After any keymap edit (layers,
+bindings, home-row mods, thumb/layer assignments), run `just html` to regenerate it.
 
-- ALWAYS update `keymap-viewer.html` in the SAME change whenever you edit layers,
-  key bindings, home row mods, thumb/layer assignments, or combos in
-  `config/corne.keymap`. A keymap edit is not complete until the viewer matches.
-- Mirror keymap changes into the JavaScript data inside `keymap-viewer.html`:
-  - The `layers` object (`base`, `nav`, `num`, `media`, `sym`, `fun`, `mouse`) —
-    each key's tap (`t`), hold (`h`), and `type`, kept in ZMK keymap order.
-  - The `combosDef` array — combo key positions and labels, matching any
-    `combos` block defined in the keymap.
-  - The sidebar header counts (`N keys · N layers · N combos`) and the `info-bar`
-    values (board, Bluetooth profiles, RGB LED count, home-row-mod tap time) when
-    the corresponding `config/corne.conf` or keymap settings change.
-- NEVER let `keymap-viewer.html` drift from `config/corne.keymap`.
-- `just check` (and `just build`) enforces this locally: it runs
+- **Generated** (run `just html` after any keymap change):
+  - The `const layers` block — each key's tap (`t`), hold (`h`), and `type` for all layers.
+- **Hand-maintained** (NOT touched by `just html`):
+  - The HTML/CSS shell, key `positions`, and rendering JS.
+  - `layerDescriptions` — the sidebar text for each layer.
+  - Per-layer icon and color — these live in `METADATA` inside `scripts/gen-viewer.js`
+    (edit there, not in `keymap-viewer.html`).
+- **New keycodes/macros:** add friendly labels and color categories to the `LABELS` /
+  type maps in `scripts/gen-viewer.js`. The generator prints a `WARN` for any unmapped
+  macro/behavior token — use that as the cue to extend the maps.
+- **Never** hand-edit the `const layers` block — it will be overwritten on the next
+  `just html` run.
+- `just check` (and `just build`) still enforce structural sync via
   `scripts/check-viewer-sync.js`, which fails if `keymap-viewer.html` structurally
   drifts from `config/corne.keymap` (layer count, per-layer key count, BASE
   thumb-layer order, home-row-mod positions). Labels/glyphs are not checked, so
