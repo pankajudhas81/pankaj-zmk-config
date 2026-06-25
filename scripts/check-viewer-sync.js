@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// scripts/check-viewer-sync.js
+// FilePath: scripts/check-viewer-sync.js
+
 // Fails (exit 1) if keymap-viewer.html structurally drifts from config/corne.keymap.
 // Label-agnostic: never false-positives on styling diffs (RET vs ENTER, CMD vs LGUI, DISP vs EP TOG).
 // Requires `keymap` (keymap-drawer) on PATH and node. No other deps.

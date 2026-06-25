@@ -1,3 +1,5 @@
+<!-- FilePath: README.md -->
+
 # Corne ZMK Keymap
 
 Split ergonomic keyboard (42 keys) running [ZMK firmware](https://zmk.dev) on Nice!Nano v2.
@@ -32,8 +34,11 @@ Requires `just` and Docker Desktop (running).
 ```sh
 just build             # build all targets -> firmware/
 just build left right  # build only specific halves (faster)
+just check             # verify keymap-viewer.html matches the keymap (CI gate)
 just clean             # wipe the local west workspace + build cache
 ```
+
+`just build` also regenerates `corne_keymap.svg` and warns if `keymap-viewer.html` has drifted from the keymap; `just check` runs that drift check on its own — the same gate the [Draw Keymap](.github/workflows/draw-keymap.yml) workflow enforces.
 
 Targets: `left` `right` `left_view` `right_view` `reset`. Outputs land in `firmware/` (committed to
 git) as `corne_left.uf2`, `corne_right.uf2`, `corne_left_nice_view.uf2`, `corne_right_nice_view.uf2`,
