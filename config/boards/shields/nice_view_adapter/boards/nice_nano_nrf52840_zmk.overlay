@@ -1,3 +1,5 @@
+// FilePath: config/boards/shields/nice_view_adapter/boards/nice_nano_nrf52840_zmk.overlay
+
 /*
  * FILE: nice_nano_nrf52840_zmk.overlay  (nice_view_adapter shield)
  *

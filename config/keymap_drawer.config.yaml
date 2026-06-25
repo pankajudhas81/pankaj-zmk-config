@@ -1,3 +1,5 @@
+# FilePath: config/keymap_drawer.config.yaml
+
 parse_config:
   raw_binding_map:
     "&display_tog":

@@ -1,3 +1,5 @@
+# FilePath: config/west.yml
+
 # ═══════════════════════════════════════════════════════════════════
 # FILE: config/west.yml
 # ROLE: West workspace manifest — pins the ZMK firmware repo and version for this build.

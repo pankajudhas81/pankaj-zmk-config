@@ -1,3 +1,5 @@
+# FilePath: config/boards/shields/corne/Kconfig.shield
+
 # ═══════════════════════════════════════════════════════════════════
 # FILE: config/boards/shields/corne/Kconfig.shield
 # ROLE: Declares the SHIELD_CORNE_LEFT and SHIELD_CORNE_RIGHT Kconfig symbols.

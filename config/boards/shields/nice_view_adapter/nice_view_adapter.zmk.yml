@@ -1,3 +1,5 @@
+# FilePath: config/boards/shields/nice_view_adapter/nice_view_adapter.zmk.yml
+
 # ═══════════════════════════════════════════════════════════════════
 # FILE: config/boards/shields/nice_view_adapter/nice_view_adapter.zmk.yml
 # ROLE: ZMK shield metadata for the nice!view adapter — bridges Corne's I2C to the nice!view SPI display.

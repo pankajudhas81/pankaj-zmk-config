@@ -1,3 +1,5 @@
+# FilePath: config/boards/shields/corne/Kconfig.defconfig
+
 # ═══════════════════════════════════════════════════════════════════
 # FILE: config/boards/shields/corne/Kconfig.defconfig
 # ROLE: Shield default values injected into the Kconfig system at build time.

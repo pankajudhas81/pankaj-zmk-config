@@ -1,3 +1,5 @@
+# FilePath: build.yaml
+
 # ═══════════════════════════════════════════════════════════════════
 # FILE: build.yaml
 # ROLE: GitHub Actions build matrix — lists every firmware image to compile.

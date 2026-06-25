@@ -1,3 +1,5 @@
+// FilePath: config/boards/shields/corne/src/custom_status_screen.c
+
 /*
  * Custom Corne peripheral display
  * Trishul logo with ZMK built-in widgets

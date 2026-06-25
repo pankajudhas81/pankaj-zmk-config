@@ -1,3 +1,5 @@
+# FilePath: config/zephyr/module.yml
+
 name: yuyudhan-zmk-config
 build:
   settings:

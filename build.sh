@@ -1,3 +1,5 @@
+# FilePath: build.sh
+
 #!/usr/bin/env bash
 # build.sh — engine for `just build`. Builds Corne ZMK firmware in ONE Docker
 # container (mirrors CI: init -> update -> zephyr-export -> west build) into ./firmware/.

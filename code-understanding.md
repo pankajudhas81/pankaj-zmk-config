@@ -1,3 +1,5 @@
+<!-- FilePath: code-understanding.md -->
+
 # ZMK Config — Code Understanding
 
 ## What this repo is

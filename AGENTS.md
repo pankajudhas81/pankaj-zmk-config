@@ -1,3 +1,7 @@
+<!-- FilePath: CLAUDE.md -->
+
+<!-- FilePath: AGENTS.md -->
+
 # Project Rules
 
 > Keep this section ABOVE the `<!-- gitnexus:start -->` / `<!-- gitnexus:end -->`

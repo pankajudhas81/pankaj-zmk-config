@@ -1,3 +1,5 @@
+# FilePath: config/boards/shields/corne/corne.zmk.yml
+
 # ═══════════════════════════════════════════════════════════════════
 # FILE: config/boards/shields/corne/corne.zmk.yml
 # ROLE: ZMK shield metadata — describes the Corne shield to the ZMK build system.

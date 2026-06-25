@@ -1,3 +1,5 @@
+# FilePath: .github/workflows/build.yml
+
 name: Build ZMK firmware
 
 on:

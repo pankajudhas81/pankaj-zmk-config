@@ -1,3 +1,5 @@
+# FilePath: config/boards/shields/corne/CMakeLists.txt
+
 # ═══════════════════════════════════════════════════════════════════
 # FILE: config/boards/shields/corne/CMakeLists.txt
 # ROLE: CMake build rules for the custom right-half display.

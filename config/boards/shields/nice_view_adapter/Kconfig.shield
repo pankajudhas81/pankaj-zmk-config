@@ -1,3 +1,5 @@
+# FilePath: config/boards/shields/nice_view_adapter/Kconfig.shield
+
 # ═══════════════════════════════════════════════════════════════════
 # FILE: config/boards/shields/nice_view_adapter/Kconfig.shield
 # ROLE: Declares the SHIELD_NICE_VIEW_ADAPTER Kconfig symbol for the nice!view adapter.

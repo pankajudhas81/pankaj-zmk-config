@@ -1,3 +1,5 @@
+# FilePath: Makefile
+
 # ZMK Keymap Visualizer
 # Reusable Makefile for generating keymap visuals from any ZMK config
 #

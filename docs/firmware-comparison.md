@@ -1,3 +1,5 @@
+<!-- FilePath: docs/firmware-comparison.md -->
+
 # Keyboard Firmware: ZMK vs QMK vs RMK
 
 This repo runs ZMK on a Corne split (nice!nano v2 / nRF52840); this doc explains the three major open-source keyboard firmwares and why ZMK is the right fit here.

@@ -1,3 +1,5 @@
+// FilePath: config/boards/shields/corne/custom_config.h
+
 /*
  * ═══════════════════════════════════════════════════════════════════
  * FILE: config/boards/shields/corne/custom_config.h
