@@ -16,15 +16,14 @@
  * device.  State is tracked per-side via a static bool (one per compiled
  * firmware image), initialised false = display on, which matches boot state.
  *
- * IMPORTANT — sole-owner design: correct round-tripping requires that
- * CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE=n is set in config/corne.conf (it is).
- * Without that override, ZMK defaults BLANK_ON_IDLE to 'y' for SSD1306, and
- * its idle activity handler calls display_blanking_off() on every
- * IDLE→ACTIVE transition, desyncing the handler's state from the hardware
- * so the toggle hits the wrong branch and leaves the screen stuck off.
- * With BLANK_ON_IDLE=n the activity listener is compiled out and this
- * behavior is the only code that ever changes the blank state (deep sleep
- * still powers the whole board down after the sleep timeout as usual).
+ * REQUIRES: CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE=n in config/corne.conf (set).
+ * Without that, ZMK defaults BLANK_ON_IDLE=y for SSD1306 and its idle
+ * activity handler calls display_blanking_off() on every IDLE→ACTIVE
+ * transition, desyncing this behavior's flag from the hardware state so the
+ * toggle hits the wrong branch and the screen appears permanently stuck off.
+ * With BLANK_ON_IDLE=n that listener is compiled out entirely — this behavior
+ * is the sole owner of the panel's blank state.  Deep sleep still re-inits
+ * the display on wake as normal.
  */
 
 #define DT_DRV_COMPAT zmk_behavior_display_toggle
@@ -40,8 +39,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #if DT_HAS_COMPAT_STATUS_OKAY(DT_DRV_COMPAT)
 
-/* Per-side toggle state.  Initialised to false (display on) which matches
- * the state after zmk_display_init() calls unblank_display_cb(). */
+/* Per-side toggle state.  Initialised false (display on), matching boot. */
 static bool display_blanked = false;
 
 static int on_keymap_binding_pressed(struct zmk_behavior_binding *binding,
@@ -71,8 +69,6 @@ static int on_keymap_binding_released(struct zmk_behavior_binding *binding,
 static const struct behavior_driver_api behavior_display_toggle_driver_api = {
     .binding_pressed = on_keymap_binding_pressed,
     .binding_released = on_keymap_binding_released,
-    /* Global locality so both halves toggle their own display when the
-     * central half processes the keymap binding. */
     .locality = BEHAVIOR_LOCALITY_GLOBAL,
 };
 

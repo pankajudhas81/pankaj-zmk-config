@@ -339,7 +339,7 @@
         //     LOGOUT (⇧⌘Q)    — log out (shows the macOS logout dialog)
         //
         //   Right hand — home row (system-level controls):
-        //     DISP_TOG — toggle OLED display blanking (0xAE off / 0xAF on; VCC stays up, no reinit bug)
+        //     DISP_TOG — toggle OLED display on/off (BLANK_ON_IDLE=n makes this the sole owner)
         //     C_VOL_DN — volume down
         //     C_VOL_UP — volume up
         //     C_PREV   — previous track
