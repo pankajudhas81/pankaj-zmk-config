@@ -405,7 +405,7 @@ Your repo is a **ZMK config repository** — it contains only your configuration
 ### File Structure
 
 ```
-pankaj-zmk-config/
+yuyudhan-zmk-config/
 ├── config/
 │   ├── corne.keymap        ← your keymap (behaviors, layers, combos, macros)
 │   ├── corne.conf          ← Kconfig feature flags

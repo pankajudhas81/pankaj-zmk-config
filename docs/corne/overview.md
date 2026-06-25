@@ -718,4 +718,4 @@ Now that you understand the hardware, you're positioned to go deeper in several 
 
 ---
 
-*Generated for the pankaj-zmk-config repository. For firmware-specific documentation, see `docs/corne/firmware.md`. For layout theory, see `docs/corne/layers.md`.*
+*Generated for the yuyudhan-zmk-config repository. For firmware-specific documentation, see `docs/corne/firmware.md`. For layout theory, see `docs/corne/layouts.md`.*

@@ -26,7 +26,7 @@ GitHub Actions automatically starts a build. You do not need to run anything loc
 
 ### Step 3 — Download and flash
 
-1. Go to `https://github.com/pankajudhas81/pankaj-zmk-config/actions`
+1. Go to `https://github.com/yuyudhan/yuyudhan-zmk-config/actions`
 2. Click the most recent workflow run (the one with your commit message)
 3. Scroll to the bottom — click **Artifacts** → download the zip
 4. Unzip it. You will find files for each build target. The ones you need are named after `corne_left` and `corne_right` (the OLED builds, first two entries in `build.yaml`)
@@ -834,7 +834,7 @@ These appear in the GitHub Actions build log. Click on the failed job → expand
 | Macros | https://zmk.dev/docs/behaviors/macros |
 | ZMK Studio | https://zmk.studio |
 | ZMK Discord (best help) | https://discord.gg/zmk |
-| Your GitHub repo | https://github.com/pankajudhas81/pankaj-zmk-config |
+| Your GitHub repo | https://github.com/yuyudhan/yuyudhan-zmk-config |
 
 ### Files you edit
 
