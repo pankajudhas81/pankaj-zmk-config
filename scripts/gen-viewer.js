@@ -36,12 +36,12 @@ const MODS = new Set(["LGUI","LALT","LCTRL","LSHFT","RGUI","RALT","RCTRL","RSHFT
 const MOD_HOLD = { LGUI:"CMD", RGUI:"CMD", LALT:"OPT", RALT:"OPT", LCTRL:"CTRL", RCTRL:"CTRL", LSHFT:"SHIFT", RSHFT:"SHIFT" };
 const MOD_TAP  = { LSHFT:"LSHIFT" }; // every other mod renders as its literal keycode
 const NO_TYPE  = new Set(["RET","BSPC","DEL","SPACE","TAB","APP"]); // base-like passthroughs -> default color
-const SPECIAL_TYPE = { "DISP|TOG":"media", "OUT TOG":"bt" };
+const SPECIAL_TYPE = { "DISP|TOG":"media", "OUT TOG":"bt", "BT CLR":"bt" };
 const LABELS = {
   RET:"ENTER", LEFT:"\u2190", DOWN:"\u2193", UP:"\u2191", RIGHT:"\u2192",
   "PG DN":"PGDN", "PG UP":"PGUP", "BRI DN":"BRI-", "BRI UP":"BRI+",
   "VOL DN":"VOL-", "VOL UP":"VOL+", PP:"PLAY\nPAUSE", APP:"K_APP", "PAUSE BREAK":"PAUSE",
-  "OUT TOG":"OUT\nTOG", "DISP|TOG":"DISP\nTOG",
+  "OUT TOG":"OUT\nTOG", "DISP|TOG":"DISP\nTOG", "BT CLR":"BT\nCLR",
   "Gui+Sft+Z":"REDO", "Gui+V":"PASTE", "Gui+C":"COPY", "Gui+X":"CUT", "Gui+Z":"UNDO",
   "Ctl+Gui+Q":"LOCK", "Sft+Gui+Q":"LOGOUT",
   "&mmv MOVE_LEFT":"\u2190", "&mmv MOVE_DOWN":"\u2193", "&mmv MOVE_UP":"\u2191", "&mmv MOVE_RIGHT":"\u2192",
@@ -81,7 +81,7 @@ function parseLayers(yamlText){
 
 const warns = [];
 const lbl = (tok) => (tok in LABELS) ? LABELS[tok] : tok;
-function flag(tok, L, i){ if (!(tok in LABELS) && /[&+]/.test(tok)) warns.push(`unmapped token ${JSON.stringify(tok)} (${L} #${i}) -> add to LABELS in scripts/gen-viewer.js`); }
+function flag(tok, L, i){ if (!(tok in LABELS) && (/^&\w/.test(tok) || /\w\+\w/.test(tok))) warns.push(`unmapped token ${JSON.stringify(tok)} (${L} #${i}) -> add to LABELS in scripts/gen-viewer.js`); }
 
 function genKey(L, y, i){
   if (y === "") return {};
