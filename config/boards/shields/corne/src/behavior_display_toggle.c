@@ -6,55 +6,99 @@
  *
  * behavior_display_toggle.c
  *
- * Custom ZMK behavior: toggles the OLED display's hardware blanking state
- * (SSD1306 commands 0xAE = off / 0xAF = on) without cutting the ext-power
- * rail.  VCC is never cut — the display controller stays powered the entire
- * time, so 0xAF reliably restores the panel.
+ * Custom ZMK behavior: toggles the keyboard's screen on and off.  Runs on both
+ * halves (BEHAVIOR_LOCALITY_GLOBAL): the central relays the binding to every
+ * peripheral and then runs it locally, so each side toggles its own
+ * DT_CHOSEN(zephyr_display).
  *
- * Locality: BEHAVIOR_LOCALITY_GLOBAL — both central and peripheral halves
- * execute this binding, each toggling their own DT_CHOSEN(zephyr_display)
- * device.  State is tracked per-side via a static bool (one per compiled
- * firmware image), initialised false = display on, which matches boot state.
+ * Two display families are handled by the SAME code path:
+ *   - SSD1306 OLED (solomon,ssd1306fb): display_blanking_on/off powers the
+ * panel down (0xAE) / up (0xAF).  This is the original mechanism.
+ *   - nice!view / Sharp memory LCD (sharp,ls0xx): its driver has no
+ *     display-enable GPIO, so display_blanking_on/off return -ENOTSUP and do
+ *     NOTHING.  For these panels we blank at the LVGL layer instead — load an
+ *     empty black screen, and restore by reloading the status screen.
+ * Doing BOTH on every toggle makes the behavior correct on either panel without
+ * compile-time knowledge of which one is fitted.
  *
- * REQUIRES: CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE=n in config/corne.conf (set).
- * Without that, ZMK defaults BLANK_ON_IDLE=y for SSD1306 and its idle
- * activity handler calls display_blanking_off() on every IDLE→ACTIVE
- * transition, desyncing this behavior's flag from the hardware state so the
- * toggle hits the wrong branch and the screen appears permanently stuck off.
- * With BLANK_ON_IDLE=n that listener is compiled out entirely — this behavior
- * is the sole owner of the panel's blank state.  Deep sleep still re-inits
- * the display on wake as normal.
+ * All LVGL / display work runs on zmk_display_work_q() (never the keymap or BLE
+ * thread) — the same queue ZMK's own display tick uses.
+ *
+ * REQUIRES: CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE=n (set in config/corne.conf) so
+ * ZMK's idle handler does not also drive display_blanking_* and desync this
+ * behavior's flag from the panel.  Deep sleep re-inits the display on wake,
+ * resetting the statics below to their boot values (display on).
  */
 
 #define DT_DRV_COMPAT zmk_behavior_display_toggle
 
 #include <drivers/behavior.h>
+#include <lvgl.h>
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/display.h>
+#include <zephyr/kernel.h>
 #include <zmk/behavior.h>
+#include <zmk/display.h>
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #if DT_HAS_COMPAT_STATUS_OKAY(DT_DRV_COMPAT)
 
-/* Per-side toggle state.  Initialised false (display on), matching boot. */
+static const struct device *display = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
+
+/* Per-side state.  false = display on, matching boot. */
 static bool display_blanked = false;
+
+/* Status screen captured when we blank, restored when we unblank. */
+static lv_obj_t *saved_screen = NULL;
+/* Lazily-created all-black screen shown while blanked. */
+static lv_obj_t *blank_screen = NULL;
+
+static void blank_work_cb(struct k_work *work) {
+  /* SSD1306: power the panel off.  nice!view: -ENOTSUP, no-op. */
+  display_blanking_on(display);
+
+  if (blank_screen == NULL) {
+    blank_screen = lv_obj_create(NULL);
+    lv_obj_set_style_bg_color(blank_screen, lv_color_black(), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(blank_screen, LV_OPA_COVER, LV_PART_MAIN);
+  }
+  saved_screen = lv_screen_active();
+  lv_screen_load(blank_screen);
+  /* Flush the blank frame now (this is what actually blanks a nice!view). */
+  lv_task_handler();
+}
+
+static void unblank_work_cb(struct k_work *work) {
+  if (saved_screen != NULL) {
+    lv_screen_load(saved_screen);
+    /* Re-render the status screen into the framebuffer before power-on. */
+    lv_task_handler();
+  }
+  /* SSD1306: power the panel back on.  nice!view: -ENOTSUP, no-op. */
+  display_blanking_off(display);
+}
+
+K_WORK_DEFINE(blank_work, blank_work_cb);
+K_WORK_DEFINE(unblank_work, unblank_work_cb);
 
 static int on_keymap_binding_pressed(struct zmk_behavior_binding *binding,
                                      struct zmk_behavior_binding_event event) {
-  const struct device *display = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
-
   if (!device_is_ready(display)) {
     LOG_ERR("display_toggle: display device not ready");
     return -ENODEV;
   }
+  /* Nothing to toggle until the display subsystem (and LVGL) is up. */
+  if (!zmk_display_is_initialized()) {
+    return ZMK_BEHAVIOR_OPAQUE;
+  }
 
   if (display_blanked) {
-    display_blanking_off(display);
+    k_work_submit_to_queue(zmk_display_work_q(), &unblank_work);
   } else {
-    display_blanking_on(display);
+    k_work_submit_to_queue(zmk_display_work_q(), &blank_work);
   }
   display_blanked = !display_blanked;
 
