@@ -34,7 +34,7 @@
 //     Layer 0  BASE   — Always active. QWERTY + home row mods.
 //     Layer 1  NAV    — Vim arrows (HJKL), Home/End, clipboard. Hold: SPACE.
 //     Layer 2  NUM    — Numpad (7-8-9 / 4-5-6 / 1-2-3), brackets. Hold: BSPC.
-//     Layer 3  MEDIA  — Volume, Bluetooth profiles, power. Hold: ESC.
+//     Layer 3  MEDIA  — Volume, brightness, Bluetooth, lock/sleep/logout. Hold: ESC.
 //     Layer 4  SYM    — Symbols: { } & * ( ) : $ % ^ ~ ! @ # |. Hold: ENTER.
 //     Layer 5  FUN    — Function keys F1–F12, Print Screen, Pause. Hold: DEL.
 //     Layer 6  MOUSE  — Mouse cursor, scroll wheel, mouse buttons. Hold: TAB.
@@ -54,7 +54,7 @@
 //   Layer 0: BASE    — QWERTY + home row mods
 //   Layer 1: NAV     — vim arrows, clipboard, nav (hold SPACE)
 //   Layer 2: NUM     — numpad left hand (hold BSPC)
-//   Layer 3: MEDIA   — media, BT (hold ESC)
+//   Layer 3: MEDIA   — media, BT, brightness, lock/sleep/logout (hold ESC)
 //   Layer 4: SYM     — symbols left hand (hold ENTER)
 //   Layer 5: FUN     — function keys left hand (hold DEL)
 //   Layer 6: MOUSE   — mouse movement, scroll, buttons (hold TAB)
@@ -332,8 +332,11 @@
         //   This is the "system settings" layer — everything that changes how the
         //   keyboard behaves or what it connects to lives here.
         //
-        //   Right hand — top row: screen brightness — BRI_DN / BRI_UP sit directly
-        //   above the C_VOL_DN / C_VOL_UP keys. The other three top-row keys are unused (&none).
+        //   Right hand — top row: session + screen controls, inner → outer:
+        //     LOCK  (⌃⌘Q)     — lock the screen
+        //     BRI_DN / BRI_UP — screen brightness, above the C_VOL_DN / C_VOL_UP keys
+        //     SLEEP (C_SLEEP) — sleep the Mac (deliberate press; macOS ignores quick taps)
+        //     LOGOUT (⇧⌘Q)    — log out (shows the macOS logout dialog)
         //
         //   Right hand — home row (system-level controls):
         //     DISP_TOG — toggle OLED display blanking (0xAE off / 0xAF on; VCC stays up, no reinit bug)
@@ -350,7 +353,7 @@
         //   Left hand: bare held modifiers (same pattern as NAV/NUM).
         //
         // ┌─────────┬─────────┬─────────┬─────────┬─────────┐   ┌─────────┬─────────┬─────────┬─────────┬─────────┐
-        // │   ---   │   ---   │   ---   │   ---   │   ---   │   │   ---   │ BRI_DN  │ BRI_UP  │   ---   │   ---   │
+        // │   ---   │   ---   │   ---   │   ---   │   ---   │   │  LOCK   │ BRI_DN  │ BRI_UP  │  SLEEP  │ LOGOUT  │
         // ├─────────┼─────────┼─────────┼─────────┼─────────┤   ├─────────┼─────────┼─────────┼─────────┼─────────┤
         // │   GUI   │   ALT   │  CTRL   │  SHFT   │   ---   │   │DISP_TOG │ VOL_DN  │ VOL_UP  │ C_PREV  │ C_NEXT  │
         // ├─────────┼─────────┼─────────┼─────────┼─────────┤   ├─────────┼─────────┼─────────┼─────────┼─────────┤
@@ -362,7 +365,7 @@
         media_layer {
             display-name = "MEDIA";
             bindings = <
-&none       &none       &none         &none         &none          &none          &kp C_BRI_DN   &kp C_BRI_UP   &none          &none
+&none       &none       &none         &none         &none          &kp LC(LG(Q))  &kp C_BRI_DN   &kp C_BRI_UP   &kp C_SLEEP    &kp LS(LG(Q))
 &kp LGUI    &kp LALT    &kp LCTRL     &kp LSHFT     &none          &display_tog   &kp C_VOL_DN   &kp C_VOL_UP   &kp C_PREV   &kp C_NEXT
 &none       &none       &none         &none         &none          &out OUT_TOG &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2 &bt BT_SEL 3
                         &none         &none         &none          &kp C_STOP  &kp C_PP      &kp C_MUTE
