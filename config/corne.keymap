@@ -1,3 +1,5 @@
+// FilePath: config/corne.keymap
+
 /*
  * Copyright (c) 2020 The ZMK Contributors
  *
@@ -335,9 +337,9 @@
         //
         //   Right hand — home row (system-level controls):
         //     DISP_TOG — toggle OLED display blanking (0xAE off / 0xAF on; VCC stays up, no reinit bug)
-        //     C_PREV   — previous track
         //     C_VOL_DN — volume down
         //     C_VOL_UP — volume up
+        //     C_PREV   — previous track
         //     C_NEXT   — next track
         //
         //   Right hand — bottom row (Bluetooth and output):
@@ -348,9 +350,9 @@
         //   Left hand: bare held modifiers (same pattern as NAV/NUM).
         //
         // ┌─────────┬─────────┬─────────┬─────────┬─────────┐   ┌─────────┬─────────┬─────────┬─────────┬─────────┐
-        // │   ---   │   ---   │   ---   │   ---   │   ---   │   │   ---   │   ---   │ BRI_DN  │ BRI_UP  │   ---   │
+        // │   ---   │   ---   │   ---   │   ---   │   ---   │   │   ---   │ BRI_DN  │ BRI_UP  │   ---   │   ---   │
         // ├─────────┼─────────┼─────────┼─────────┼─────────┤   ├─────────┼─────────┼─────────┼─────────┼─────────┤
-        // │   GUI   │   ALT   │  CTRL   │  SHFT   │   ---   │   │DISP_TOG │ C_PREV  │ VOL_DN  │ VOL_UP  │ C_NEXT  │
+        // │   GUI   │   ALT   │  CTRL   │  SHFT   │   ---   │   │DISP_TOG │ VOL_DN  │ VOL_UP  │ C_PREV  │ C_NEXT  │
         // ├─────────┼─────────┼─────────┼─────────┼─────────┤   ├─────────┼─────────┼─────────┼─────────┼─────────┤
         // │   ---   │   ---   │   ---   │   ---   │   ---   │   │OUT_TOG  │  BT 0   │  BT 1   │  BT 2   │  BT 3   │
         // └─────────┴─────────┴─────────┴─────────┴─────────┘   └─────────┴─────────┴─────────┴─────────┴─────────┘
@@ -360,8 +362,8 @@
         media_layer {
             display-name = "MEDIA";
             bindings = <
-&none       &none       &none         &none         &none          &none          &none          &kp C_BRI_DN   &kp C_BRI_UP   &none
-&kp LGUI    &kp LALT    &kp LCTRL     &kp LSHFT     &none          &display_tog   &kp C_PREV  &kp C_VOL_DN  &kp C_VOL_UP &kp C_NEXT
+&none       &none       &none         &none         &none          &none          &kp C_BRI_DN   &kp C_BRI_UP   &none          &none
+&kp LGUI    &kp LALT    &kp LCTRL     &kp LSHFT     &none          &display_tog   &kp C_VOL_DN   &kp C_VOL_UP   &kp C_PREV   &kp C_NEXT
 &none       &none       &none         &none         &none          &out OUT_TOG &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2 &bt BT_SEL 3
                         &none         &none         &none          &kp C_STOP  &kp C_PP      &kp C_MUTE
             >;
