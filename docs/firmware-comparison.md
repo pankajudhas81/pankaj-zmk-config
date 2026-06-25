@@ -62,7 +62,7 @@ This repo runs ZMK on a Corne split (nice!nano v2 / nRF52840); this doc explains
 
 **Build pipeline**
 
-`config/corne.keymap` + `corne.conf` feed the ZMK app (C/Zephyr); `west` (Python) drives CMake + Ninja, which calls `arm-none-eabi-gcc`, producing `.uf2` images. Locally, `build.sh` + `justfile` orchestrate everything inside the `zmkfirmware/zmk-build-arm:stable` Docker image; GitHub Actions runs the same steps via the matrix in `build.yaml`.
+`config/corne.keymap` + `corne.conf` feed the ZMK app (C/Zephyr); `west` (Python) drives CMake + Ninja, which calls `arm-none-eabi-gcc`, producing `.uf2` images. `build.sh` + `justfile` orchestrate everything locally inside the `zmkfirmware/zmk-build-arm:stable` Docker image.
 
 ```mermaid
 flowchart TD
@@ -92,7 +92,7 @@ The left half is built with the `studio-rpc-usb-uart` snippet (central side, USB
 
 **Yes** — RMK runs on this exact hardware (nice!nano / nRF52840, `.uf2`).
 
-Migrating means rewriting everything in `config/` into `keyboard.toml` + Cargo/Embassy: all layers, combos, home-row-mod timing, nice!view/OLED shield definitions, and the `build.yaml` CI matrix. ZMK Studio live-editing (wired to the central half via `studio-rpc-usb-uart`) has no equivalent in RMK's current Vial-over-BLE path.
+Migrating means rewriting everything in `config/` into `keyboard.toml` + Cargo/Embassy: all layers, combos, home-row-mod timing, nice!view/OLED shield definitions, and the `build.sh` target matrix. ZMK Studio live-editing (wired to the central half via `studio-rpc-usb-uart`) has no equivalent in RMK's current Vial-over-BLE path.
 
 Rust's main win — compile-time memory safety in firmware code *you write* — barely applies here. This repo maintains a keymap DSL, not firmware; the C is upstream, battle-tested ZMK. The safety argument lands when you're authoring Embassy tasks and interrupt handlers yourself.
 

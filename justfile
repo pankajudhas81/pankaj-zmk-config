@@ -16,7 +16,7 @@ build *targets:
       make -B svg || echo "==> SVG generation failed (see above); firmware is fine"; \
     else echo "==> keymap-drawer not installed; run: pipx install --python python3.12 keymap-drawer==0.23.0"; fi
 
-# Check keymap-viewer.html is structurally in sync with config/corne.keymap (matches the CI gate)
+# Check keymap-viewer.html is structurally in sync with config/corne.keymap
 check:
     node scripts/check-viewer-sync.js
 

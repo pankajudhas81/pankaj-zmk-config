@@ -4,14 +4,13 @@
 
 ## What this repo is
 
-ZMK firmware config for a Corne split keyboard (42 keys, 2 halves, wireless via BLE). Built on the ZMK firmware for nRF52840 (nice!nano v2). This repo contains only the *config layer* — the actual ZMK firmware source is fetched by West from GitHub at build time. Nothing here is compiled locally unless you run the Makefile; normally GitHub Actions handles it.
+ZMK firmware config for a Corne split keyboard (42 keys, 2 halves, wireless via BLE). Built on the ZMK firmware for nRF52840 (nice!nano v2). This repo contains only the *config layer* — the actual ZMK firmware source is fetched by West from GitHub at build time. Firmware is compiled locally via `just build` (Docker + west); see the README "Build Firmware" section.
 
 ---
 
 ## Repo layout
 
 ```
-build.yaml                        — build matrix (what GitHub Actions compiles)
 config/
   corne.conf                      — master keyboard config (behaviour, power)
   corne.keymap                    — all keybindings and layer definitions
@@ -68,7 +67,7 @@ Each layer concentrates its keys on one hand so the other hand is free to hold t
 1. Open `config/corne.keymap`.
 2. Find the layer block by name (e.g. `layer_base`, `layer_nav`).
 3. Edit `&kp KEY` for a plain keypress, `&lt LAYER KEY` for a layer-tap, or `&mt MOD KEY` for a mod-tap.
-4. Push to GitHub — Actions rebuilds and produces a new `.uf2`.
+4. Run `just build` to compile new `.uf2` images into `firmware/`.
 
 For live editing without reflashing, connect the left half via USB and use **ZMK Studio** (web or desktop). Changes made in Studio are saved to the left half's flash and take effect immediately.
 
@@ -76,9 +75,11 @@ For live editing without reflashing, connect the left half via USB and use **ZMK
 
 ## How to build
 
-**Automatically:** push any commit — GitHub Actions reads `build.yaml` and compiles all targets. Download the `.uf2` artifacts from the Actions run.
-
-**Locally:** run `make` (requires a configured West workspace with the ZMK SDK).
+Run `just build` (requires `just` + Docker Desktop) — it spins up the
+`zmkfirmware/zmk-build-arm:stable` container, runs west init/update/build, and
+writes every `.uf2` image to `firmware/`. Build specific halves with e.g.
+`just build left right`. See the README "Build Firmware" section for the full
+recipe list.
 
 **Flashing:**
 1. Double-tap the reset button on the target half to enter bootloader mode.

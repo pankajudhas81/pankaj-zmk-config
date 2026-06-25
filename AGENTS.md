@@ -26,10 +26,11 @@ It is NOT auto-generated.
     values (board, Bluetooth profiles, RGB LED count, home-row-mod tap time) when
     the corresponding `config/corne.conf` or keymap settings change.
 - NEVER let `keymap-viewer.html` drift from `config/corne.keymap`.
-- CI enforces this: the `Draw Keymap` workflow runs `scripts/check-viewer-sync.js`,
-  which fails the build if `keymap-viewer.html` structurally drifts from
-  `config/corne.keymap` (layer count, per-layer key count, BASE thumb-layer order,
-  home-row-mod positions). Labels/glyphs are not checked, so styling is free.
+- `just check` (and `just build`) enforces this locally: it runs
+  `scripts/check-viewer-sync.js`, which fails if `keymap-viewer.html` structurally
+  drifts from `config/corne.keymap` (layer count, per-layer key count, BASE
+  thumb-layer order, home-row-mod positions). Labels/glyphs are not checked, so
+  styling is free.
 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
