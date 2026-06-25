@@ -20,6 +20,10 @@ build *targets:
 check:
     node scripts/check-viewer-sync.js
 
+# Regenerate the keymap-viewer.html `layers` data block from config/corne.keymap
+html:
+    node scripts/gen-viewer.js
+
 # Regenerate corne_keymap.svg from config/corne.keymap (requires keymap-drawer: make install)
 svg:
     make svg
