@@ -11,15 +11,18 @@
  * peripheral and then runs it locally, so each side toggles its own
  * DT_CHOSEN(zephyr_display).
  *
- * Two display families are handled by the SAME code path:
+ * Two display families are handled by the SAME code path — hardware blanking
+ * first, with an LVGL fallback only when it is unsupported:
  *   - SSD1306 OLED (solomon,ssd1306fb): display_blanking_on/off powers the
- * panel down (0xAE) / up (0xAF).  This is the original mechanism.
+ *     panel down (0xAE) / up (0xAF) and returns 0.  On success we STOP here —
+ *     this is the native, artifact-free path; an LVGL screen swap on top of it
+ *     corrupts the OLED's rendering after a toggle.
  *   - nice!view / Sharp memory LCD (sharp,ls0xx): its driver has no
- *     display-enable GPIO, so display_blanking_on/off return -ENOTSUP and do
- *     NOTHING.  For these panels we blank at the LVGL layer instead — load an
- *     empty black screen, and restore by reloading the status screen.
- * Doing BOTH on every toggle makes the behavior correct on either panel without
- * compile-time knowledge of which one is fitted.
+ *     display-enable GPIO, so display_blanking_on/off return -ENOTSUP
+ * (non-zero) and do NOTHING.  Only then do we blank at the LVGL layer — load an
+ * empty black screen, and restore by reloading the status screen. The
+ * hardware-blanking return value selects the path at runtime, so no
+ * compile-time knowledge of which panel is fitted is needed.
  *
  * All LVGL / display work runs on zmk_display_work_q() (never the keymap or BLE
  * thread) — the same queue ZMK's own display tick uses.
@@ -57,9 +60,16 @@ static lv_obj_t *saved_screen = NULL;
 static lv_obj_t *blank_screen = NULL;
 
 static void blank_work_cb(struct k_work *work) {
-  /* SSD1306: power the panel off.  nice!view: -ENOTSUP, no-op. */
-  display_blanking_on(display);
+  /* Hardware blanking first.  SSD1306 OLED: powers the panel off (0xAE) and
+   * returns 0 — the native, artifact-free path, so we STOP here.  Layering an
+   * LVGL screen swap on top of it corrupts the OLED's rendering after a toggle.
+   */
+  if (display_blanking_on(display) == 0) {
+    return;
+  }
 
+  /* No hardware blanking (nice!view ls0xx returns -ENOTSUP): blank at the LVGL
+   * layer with an all-black screen. */
   if (blank_screen == NULL) {
     blank_screen = lv_obj_create(NULL);
     lv_obj_set_style_bg_color(blank_screen, lv_color_black(), LV_PART_MAIN);
@@ -72,13 +82,18 @@ static void blank_work_cb(struct k_work *work) {
 }
 
 static void unblank_work_cb(struct k_work *work) {
+  /* Mirror of blank: hardware unblanking first (SSD1306: 0xAF, returns 0 =
+   * done).  Only fall back to the LVGL restore when hardware blanking is
+   * unsupported (nice!view). */
+  if (display_blanking_off(display) == 0) {
+    return;
+  }
+
   if (saved_screen != NULL) {
     lv_screen_load(saved_screen);
-    /* Re-render the status screen into the framebuffer before power-on. */
+    /* Re-render the status screen into the framebuffer. */
     lv_task_handler();
   }
-  /* SSD1306: power the panel back on.  nice!view: -ENOTSUP, no-op. */
-  display_blanking_off(display);
 }
 
 K_WORK_DEFINE(blank_work, blank_work_cb);
