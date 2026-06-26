@@ -18,12 +18,13 @@ else
 fi
 
 mkdir -p "$REPO_DIR/firmware"
+STAMP="$(date '+%Y-%m-%d_%H-%M-%S')"
 
 docker run --rm -i \
   -v "$REPO_DIR:/workspace" \
   -w /workspace \
   "$IMAGE" \
-  bash -euo pipefail -s -- "${TARGETS[@]}" <<'INNER'
+  bash -euo pipefail -s -- "$STAMP" "${TARGETS[@]}" <<'INNER'
 declare -A SHIELD=(
   [left]="corne_left"
   [right]="corne_right"
@@ -42,6 +43,9 @@ declare -A OUT=(
   [right_view]="corne_right_nice_view"
   [reset]="settings_reset"
 )
+STAMP="$1"; shift
+OUTDIR="firmware/$STAMP"
+mkdir -p "$OUTDIR"
 
 if [ ! -e .west/config ]; then
   west init -l config
@@ -62,12 +66,12 @@ for key in "$@"; do
   if [ -n "$snippet" ]; then bargs+=(-S "$snippet"); fi
   echo "==> Building $out (shield: $shield)"
   west build "${bargs[@]}" -- -DZMK_CONFIG=/workspace/config -DSHIELD="$shield"
-  cp "$d/zephyr/zmk.uf2" "firmware/$out.uf2"
-  echo "==> Wrote firmware/$out.uf2"
+  cp "$d/zephyr/zmk.uf2" "$OUTDIR/$out.uf2"
+  echo "==> Wrote $OUTDIR/$out.uf2"
 done
 
 echo "==> Done. Firmware:"
-ls -l firmware/
+ls -l "$OUTDIR"
 INNER
 
-echo "All firmware written to $REPO_DIR/firmware/"
+echo "All firmware written to $REPO_DIR/firmware/$STAMP/"

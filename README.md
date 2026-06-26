@@ -32,7 +32,7 @@ Firmware builds locally via [`just`](https://github.com/casey/just) + Docker —
 Requires `just` and Docker Desktop (running).
 
 ```sh
-just build             # build all targets -> firmware/
+just build             # build all targets -> firmware/<datetime>/
 just build left right  # build only specific halves (faster)
 just check             # verify keymap-viewer.html matches the keymap
 just clean             # wipe the local west workspace + build cache
@@ -40,14 +40,15 @@ just clean             # wipe the local west workspace + build cache
 
 `just build` also regenerates `corne_keymap.svg` and warns if `keymap-viewer.html` has drifted from the keymap; `just check` runs that drift check on its own.
 
-Targets: `left` `right` `left_view` `right_view` `reset`. Outputs land in `firmware/` (committed to
-git) as `corne_left.uf2`, `corne_right.uf2`, `corne_left_nice_view.uf2`, `corne_right_nice_view.uf2`,
-`settings_reset.uf2`.
+Targets: `left` `right` `left_view` `right_view` `reset`. Outputs land in a timestamped
+`firmware/<datetime>/` directory (e.g. `firmware/2026-06-26_14-30-05/`), one dir per run,
+**gitignored — not committed**, containing `corne_left.uf2`, `corne_right.uf2`,
+`corne_left_nice_view.uf2`, `corne_right_nice_view.uf2`, `settings_reset.uf2`.
 
 ### Flash
 
 1. Double-tap the reset button on a half → it mounts as the `NICENANO` USB drive.
-2. Drag the matching `.uf2` from `firmware/` onto it; it reboots automatically.
+2. Drag the matching `.uf2` from the newest `firmware/<datetime>/` directory onto it; it reboots automatically.
 3. Repeat for the other half. Reflash **both** halves after any `config/` change.
 
 ## Regenerate Keymap SVG

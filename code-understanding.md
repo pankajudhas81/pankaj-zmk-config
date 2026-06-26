@@ -70,7 +70,7 @@ Each layer concentrates its keys on one hand so the other hand is free to hold t
 1. Open `config/corne.keymap`.
 2. Find the layer block by name (e.g. `layer_base`, `layer_nav`).
 3. Edit `&kp KEY` for a plain keypress, `&lt LAYER KEY` for a layer-tap, or `&mt MOD KEY` for a mod-tap.
-4. Run `just build` to compile new `.uf2` images into `firmware/`.
+4. Run `just build` to compile new `.uf2` images into a timestamped `firmware/<datetime>/` directory.
 
 For live editing without reflashing, connect the left half via USB and use **ZMK Studio** (web or desktop). Changes made in Studio are saved to the left half's flash and take effect immediately.
 
@@ -80,7 +80,7 @@ For live editing without reflashing, connect the left half via USB and use **ZMK
 
 Run `just build` (requires `just` + Docker Desktop) — it spins up the
 `zmkfirmware/zmk-build-arm:stable` container, runs west init/update/build, and
-writes every `.uf2` image to `firmware/`. Build specific halves with e.g.
+writes every `.uf2` image to a timestamped `firmware/<datetime>/` directory.
 `just build left right`. See the README "Build Firmware" section for the full
 recipe list.
 
