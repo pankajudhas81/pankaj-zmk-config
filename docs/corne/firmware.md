@@ -637,7 +637,7 @@ On your bottom row of the MOUSE layer.
 &mkp MB5     // button 5 (browser forward)
 ```
 
-Your thumb row on MOUSE layer: `&mkp MCLK &mkp LCLK &mkp RCLK`.
+Your thumb row on MOUSE layer: `&mkp LCLK &mkp MCLK &mkp RCLK`.
 
 ### Macros
 
@@ -1031,10 +1031,10 @@ Function keys in numpad layout (mirrors NUM). F10–F12 on the pinky home column
 ----  --  --  --  --  --    --   --   --   --  --  --
 ----  ⌘   ⌥   ^   ⇧   --    ←    ↓    ↑    →   --  --
 ----  --  --  --  --  --    ⟵    ⇩    ⇧    ⟶   --  --
-              [--] [--] [--]  [MCK] [LCK] [RCK]
+              [--] [--] [--]  [LCK] [MCK] [RCK]
 ```
 
-HJKL drives mouse movement (right home row). Bottom row drives scroll. Thumb buttons: middle click, left click, right click. Left home row has modifiers for Shift+click, Ctrl+click, etc.
+HJKL drives mouse movement (right home row). Bottom row drives scroll. Thumb buttons: left click, middle click, right click. Left home row has modifiers for Shift+click, Ctrl+click, etc.
 
 ---
 

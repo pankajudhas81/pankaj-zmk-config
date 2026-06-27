@@ -1238,7 +1238,7 @@ MOUSE — Mouse movement, scrolling, buttons (hold TAB on left thumb)
 │     │     │     │     │     │     │   │ ←SC │ ↓SC │ ↑SC │ →SC │     │     │
 └─────┴─────┴─────┴─────┴─────┴─────┘   └─────┴─────┴─────┴─────┴─────┴─────┘
                     ┌─────┬─────┬─────┐   ┌─────┬─────┬─────┐
-                    │     │     │[MOU]│   │MCLK │LCLK │RCLK │
+                    │     │     │[MOU]│   │LCLK │MCLK │RCLK │
                     │     │     │(held)│  │     │     │     │
                     └─────┴─────┴─────┘   └─────┴─────┴─────┘
 Notes:
