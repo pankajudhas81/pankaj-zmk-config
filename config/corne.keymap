@@ -477,11 +477,12 @@
         //       Scroll mirrors the pointer row one row below, same column order.
         //       Horizontal scroll is included for spreadsheets and wide canvases.
         //
-        //   Thumb right: mkp (mouse button) MCLK / LCLK / RCLK
-        //     Middle, Left, Right click under the right thumb. The right hand
-        //     can move the pointer while the right thumb clicks — no need to
-        //     lift off the layer. Left-click on the centre thumb mirrors its
-        //     position importance (most-used button, most-accessible thumb key).
+        //   Thumb right: mkp (mouse button) LCLK / MCLK / RCLK
+        //     Left, Middle, Right click under the right thumb, mirroring a
+        //     physical mouse: left-click on the inner thumb, middle in the
+        //     centre, right-click on the outer thumb. The right hand can move
+        //     the pointer while the right thumb clicks — no need to lift off
+        //     the layer.
         //
         //   Left hand — bare modifiers on the home row (GUI  Alt  Ctrl  Shift):
         //     Shift+click = extend selection; Ctrl+click = multi-select;
@@ -498,7 +499,7 @@
         // │   ---   │   ---   │   ---   │   ---   │   ---   │   │ SC_LEFT │ SC_DOWN │  SC_UP  │SC_RIGHT │   ---   │
         // └─────────┴─────────┴─────────┴─────────┴─────────┘   └─────────┴─────────┴─────────┴─────────┴─────────┘
         //                               ┌──────────────┬──────────────┬──────────────┐   ┌──────────────┬──────────────┬──────────────┐
-        //                               │     ---      │     ---      │   [HELD]     │   │   MID CLK    │   LFT CLK    │   RGT CLK    │
+        //                               │     ---      │     ---      │   [HELD]     │   │   LFT CLK    │   MID CLK    │   RGT CLK    │
         //                               └──────────────┴──────────────┴──────────────┘   └──────────────┴──────────────┴──────────────┘
         mouse_layer {
             display-name = "MOUSE";
@@ -506,7 +507,7 @@
 &none       &none       &none         &none         &none          &none            &none            &none          &none             &none
 &kp LGUI    &kp LALT    &kp LCTRL     &kp LSHFT     &none          &mmv MOVE_LEFT   &mmv MOVE_DOWN   &mmv MOVE_UP   &mmv MOVE_RIGHT   &none
 &none       &none       &none         &none         &none          &msc SCRL_LEFT   &msc SCRL_DOWN   &msc SCRL_UP   &msc SCRL_RIGHT   &none
-                        &none         &none         &none          &mkp MCLK        &mkp LCLK        &mkp RCLK
+                        &none         &none         &none          &mkp LCLK        &mkp MCLK        &mkp RCLK
             >;
         };
     };
