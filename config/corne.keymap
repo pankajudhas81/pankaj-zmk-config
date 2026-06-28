@@ -187,7 +187,7 @@
 / {
 
     behaviors {
-        display_tog: display_toggle {
+        display_tog: disp_tog {
             compatible = "zmk,behavior-display-toggle";
             #binding-cells = <0>;
         };

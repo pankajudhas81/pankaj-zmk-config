@@ -102,7 +102,7 @@ K_WORK_DEFINE(unblank_work, unblank_work_cb);
 static int on_keymap_binding_pressed(struct zmk_behavior_binding *binding,
                                      struct zmk_behavior_binding_event event) {
   if (!device_is_ready(display)) {
-    LOG_ERR("display_toggle: display device not ready");
+    LOG_ERR("disp_tog: display device not ready");
     return -ENODEV;
   }
   /* Nothing to toggle until the display subsystem (and LVGL) is up. */
